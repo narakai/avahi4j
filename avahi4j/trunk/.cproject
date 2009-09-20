@@ -33,6 +33,7 @@
 <option id="gnu.c.compiler.option.include.paths.1271498587" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="/usr/lib/jvm/java-6-sun/include"/>
 <listOptionValue builtIn="false" value="/usr/lib/jvm/java-6-sun/include/linux"/>
+<listOptionValue builtIn="false" value="/usr/include/avahi-common"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.523204551" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
@@ -331,6 +332,7 @@
 <option id="gnu.c.compiler.option.include.paths.354158157" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="/usr/lib/jvm/java-6-sun/include"/>
 <listOptionValue builtIn="false" value="/usr/lib/jvm/java-6-sun/include/linux"/>
+<listOptionValue builtIn="false" value="/usr/include/avahi-common"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1380797413" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>

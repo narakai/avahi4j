@@ -92,8 +92,10 @@
 #define AVAHI_LOCK(client) avahi_threaded_poll_lock(client->pollLoop)
 #define AVAHI_UNLOCK(client) avahi_threaded_poll_unlock(client->pollLoop)
 
-// translate an interface index to an avahi interface index
+// translate an interface index to an avahi interface index and back
 #define GET_AVAHI_IF_IDX(i) (i==-1)?AVAHI_IF_UNSPEC:i
+#define GET_JAVA_IF_IDX(avahi_if_idx) (avahi_if_idx==AVAHI_IF_UNSPEC)?-1:avahi_if_idx
+
 // translate a Avahi4JConstant.Protocol enum to an AvahiProtocol
 #define GET_AVAHI_PROTO(avahip, userp, e, ret) do {\
 		avahip=-1;\
@@ -112,6 +114,30 @@
 		int value = (*e)->CallIntMethod(e, userp, ordinal);\
 		avahip = (value==0)?AVAHI_PROTO_INET:(value==1)?AVAHI_PROTO_INET6:AVAHI_PROTO_UNSPEC;\
 	} while(0)
+// tranlsate an AvahiProtocol to a java enum
+#define GET_JAVA_PROTO(avahip, javap) do {\
+		switch(avahip){\
+		case AVAHI_PROTO_INET:\
+			javap=0;\
+			break;\
+		case AVAHI_PROTO_INET6:\
+			javap=1;\
+			break;\
+		default:\
+			javap=2;\
+		};\
+	} while(0)
+
+// translate AvahiLookupResultFlags to java Avahi4jConstants.LOOKUP_RESULT_*
+#define GET_JAVA_LOOKUP_RES_FLAG(avahif, javaf) do {\
+		javaf = 0;\
+		if(avahif & AVAHI_LOOKUP_RESULT_CACHED) javaf &= 1;\
+		if(avahif & AVAHI_LOOKUP_RESULT_WIDE_AREA) javaf &= (1<<1);\
+		if(avahif & AVAHI_LOOKUP_RESULT_MULTICAST) javaf &= (1<<2);\
+		if(avahif & AVAHI_LOOKUP_RESULT_LOCAL) javaf &= (1<<3);\
+		if(avahif & AVAHI_LOOKUP_RESULT_OUR_OWN) javaf &= (1<<4);\
+		if(avahif & AVAHI_LOOKUP_RESULT_STATIC) javaf &= (1<<5);\
+	}while(0)
 
 // jstring to const char* helpers
 #define GET_UTF_STR(cstr, jstr, e, ret) \
@@ -163,6 +189,13 @@ struct avahi4j_entry_group {
 	JavaVM 				*jvm;
 	jmethodID			groupCallbackDispatch;
 	jobject				groupObject;
+};
+
+struct avahi4j_service_browser {
+	AvahiServiceBrowser	*browser;
+	JavaVM 				*jvm;
+	jmethodID			browserCallbackDispatch;
+	jobject				browserObject;
 };
 
 #endif /* COMMON_H_ */

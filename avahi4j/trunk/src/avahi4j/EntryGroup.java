@@ -62,6 +62,7 @@ public class EntryGroup {
 		AVAHI_ENTRY_GROUP_FAILURE 
 	};
 	
+	
 	/*
 	 * N A T I V E   M E T H O D S
 	 */

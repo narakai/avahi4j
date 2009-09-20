@@ -18,6 +18,19 @@
 package avahi4j;
 
 public class Avahi4JConstants {
+	public final static int LOOKUP_NO_TXT = 1;
+	public final static int LOOKUP_NO_ADDRESS = 1 << 1;
+	public final static int LOOKUP_FLAGS_MAX = (1 << 2) -1 ;
+
+	
+	public final static int LOOKUP_RESULT_CACHED = 1;
+	public final static int LOOKUP_RESULT_WIDE_AREA = 1 << 1;
+	public final static int LOOKUP_RESULT_MULTICAST = 1 << 2;
+	public final static int LOOKUP_RESULT_LOCAL = 1 << 3;
+	public final static int LOOKUP_RESULT_OUR_OWN = 1 << 4;
+	public final static int LOOKUP_RESULT_STATIC = 1 << 5;
+	public final static int LOOKUP_RESULT_FLAGS_MAX = (1 << 6)-1;
+	
 	public enum Protocol {
 		INET,
 		INET6,

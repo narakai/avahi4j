@@ -1,0 +1,61 @@
+Avahi4J is a Java wrapper around Avahi, an open-source ZeroConf implementation
+for Linux.
+
+
+= FEATURES =
+Avahi4J provides the following:
+* services publishing
+* services browsing
+* service resolution
+
+
+= QUICK START =
+The following steps will get you started with Avahi4J. (The commands shown have
+been tested under Ubuntu):
+
+* Make sure Avahi and its development files are installed.
+sudo apt-get install libavahi-client-dev
+
+- Make sure the Avahi daemon is running.
+sudo /etc/init.d/avahi-daemon start
+
+- Make sure Ant, and Java JDK 6 are installed.
+sudo apt-get install openjdk-6-jdk ant
+
+- Compile Avahi4J with:
+ant clean all
+
+- Run a test application:
+ant test-client
+
+Avahi4J JAR file (avahi4j.jar) and JNI library (libavahi4j.so) can be installed
+and uninstalled with:
+sudo ant install
+sudo ant uninstall
+(Default JAR directory is /usr/share/java & JNI directory is /usr/lib/jni)
+
+- Generate Avahi4J's javadoc with
+ant javadoc
+
+- Assuming you have installed Avahi4j, you can use it in your own application.
+You must pass "-cp /usr/share/java/avahi4j.jar -Djava.library.path=/usr/lib/jni"
+to the JVM when running your application.
+
+
+= DOCUMENTATION = 
+The latest version of Avahi4J & associated documentation can always be found at
+http://avahi4j.googlecode.com
+
+
+= TROUBLESHOOTING =
+You can compile Avahi4J to ouput extra debug statements, useful to troubleshoot
+issues. Make sure you uninstall any previous Avahi4J installations:
+sudo ant uninstall
+Recompile:
+ant clean all-debug
+Re-install:
+sudo ant install
+
+
+= CONTACT =
+Feedback, issues and queries can be emailed to avahi4j@googlegroups.com

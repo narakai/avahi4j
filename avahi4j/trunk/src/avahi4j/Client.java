@@ -26,7 +26,6 @@ public class Client {
 	 * @author gilles
 	 *
 	 */
-	//if the following enum is changed, adjust simpleMDNS_Client.c
 	public static enum State {
 		REGISTERING,
 		RUNNING,
