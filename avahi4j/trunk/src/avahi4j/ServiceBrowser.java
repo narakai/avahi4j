@@ -17,7 +17,6 @@
 */
 package avahi4j;
 
-import avahi4j.Avahi4JConstants.LookupResultFlag;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
@@ -54,7 +53,7 @@ public class ServiceBrowser {
 	 * @throws Avahi4JException if there is an error creating the browser
 	 */
 	private native long initBrowser(long avahi4j_client_ptr,
-			int interfaceNum, Protocol proto, String type, String domain, 
+			int interfaceNum, int proto, String type, String domain, 
 			int lookupFlags) throws Avahi4JException;
 	/**
 	 * This method frees the avahi4j_service_browser
@@ -88,7 +87,7 @@ public class ServiceBrowser {
 		
 		browserCallback = callback;
 		avahi4j_service_browser_ptr =  initBrowser(avahi4j_client_ptr, interfaceNum,
-				proto, type, domain, lookupFlags);
+				proto.ordinal(), type, domain, lookupFlags);
 	}
 	
 	/**
@@ -106,7 +105,7 @@ public class ServiceBrowser {
 	 * This method is called from JNI to dispatch a callback
 	 */
 	@SuppressWarnings("unused")
-	private void serviceCallback(int interfaceNum, int proto, int browserEvent,
+	private void browserCallback(int interfaceNum, int proto, int browserEvent,
 			String name, String type, String domain, int flags){
 		
 		browserCallback.serviceCallback(interfaceNum, Protocol.values()[proto],

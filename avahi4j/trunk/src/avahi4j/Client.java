@@ -18,6 +18,7 @@
 
 package avahi4j;
 
+import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
 public class Client {
@@ -209,7 +210,7 @@ public class Client {
 	 * @return an empty {@link EntryGroup}
 	 * @throw {@link Avahi4JException} if there is an error creating the new group
 	 */
-	public EntryGroup createEntryGroup(IEntryGroupCallback callback) throws Avahi4JException{
+	public synchronized EntryGroup createEntryGroup(IEntryGroupCallback callback) throws Avahi4JException{
 		return new EntryGroup(callback, avahi4j_client_ptr);
 	}
 	
@@ -219,8 +220,19 @@ public class Client {
 	 * @return an empty {@link EntryGroup}
 	 * @throw {@link Avahi4JException} if there is an error creating the new group
 	 */
-	public EntryGroup createEntryGroup() throws Avahi4JException{
+	public synchronized EntryGroup createEntryGroup() throws Avahi4JException{
 		return createEntryGroup(null);
+	}
+	
+	public synchronized ServiceBrowser createServiceBrowser(
+			IServiceBrowserCallback callback, int interfaceNum, Protocol proto, 
+			String type, String domain,	int lookupFlags) throws Avahi4JException{
+		
+		if (callback==null || type==null)
+			throw new NullPointerException("neither the callback nor the type can be null");
+		
+		return new ServiceBrowser(callback, avahi4j_client_ptr, interfaceNum, 
+				proto, type, domain, lookupFlags);
 	}
 	
 	/**

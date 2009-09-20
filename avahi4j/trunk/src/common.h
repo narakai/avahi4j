@@ -20,16 +20,18 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#include <string.h>
 #include <stdlib.h>
 #include <avahi-client/client.h>
-#include <avahi-common/error.h>
-#include <avahi-common/malloc.h>
-#include <avahi-common/simple-watch.h>
+#include <avahi-client/lookup.h>
 #include <avahi-client/publish.h>
+#include <avahi-common/address.h>
+#include <avahi-common/error.h>
+#include <string.h>
+
 // use fixed local copy of thread-watch since Avahi's provided one has a bug
 // that was fixed only since 0.6.24...
 #include "thread-watch.h"
+#include "jni_helpers.h"
 
 #define CLEAR(x) do {memset(&x, 0x0, sizeof(x));}while(0)
 #define info(format, ...) do {\
@@ -88,87 +90,6 @@
 		} while(0)
 
 
-// acquire / release avahi client/poll mutex
-#define AVAHI_LOCK(client) avahi_threaded_poll_lock(client->pollLoop)
-#define AVAHI_UNLOCK(client) avahi_threaded_poll_unlock(client->pollLoop)
-
-// translate an interface index to an avahi interface index and back
-#define GET_AVAHI_IF_IDX(i) (i==-1)?AVAHI_IF_UNSPEC:i
-#define GET_JAVA_IF_IDX(avahi_if_idx) (avahi_if_idx==AVAHI_IF_UNSPEC)?-1:avahi_if_idx
-
-// translate a Avahi4JConstant.Protocol enum to an AvahiProtocol
-#define GET_AVAHI_PROTO(avahip, userp, e, ret) do {\
-		avahip=-1;\
-		jclass enum_class = (*e)->FindClass(e, "java/lang/Enum");\
-		if (enum_class==NULL) {\
-			dprint("unable to find Enum class\n");\
-			THROW_EXCEPTION(e, JNI_EXCP, "unable to locate Enum class");\
-			return ret;\
-		}\
-		jmethodID ordinal = (*e)->GetMethodID(e, enum_class, "ordinal", "()I");\
-		if (ordinal==NULL) {\
-			dprint("unable to find Enum.ordinal method\n");\
-			THROW_EXCEPTION(e, JNI_EXCP, "unable to locate Enum.ordinal method");\
-			return ret;\
-		}\
-		int value = (*e)->CallIntMethod(e, userp, ordinal);\
-		avahip = (value==0)?AVAHI_PROTO_INET:(value==1)?AVAHI_PROTO_INET6:AVAHI_PROTO_UNSPEC;\
-	} while(0)
-// tranlsate an AvahiProtocol to a java enum
-#define GET_JAVA_PROTO(avahip, javap) do {\
-		switch(avahip){\
-		case AVAHI_PROTO_INET:\
-			javap=0;\
-			break;\
-		case AVAHI_PROTO_INET6:\
-			javap=1;\
-			break;\
-		default:\
-			javap=2;\
-		};\
-	} while(0)
-
-// translate AvahiLookupResultFlags to java Avahi4jConstants.LOOKUP_RESULT_*
-#define GET_JAVA_LOOKUP_RES_FLAG(avahif, javaf) do {\
-		javaf = 0;\
-		if(avahif & AVAHI_LOOKUP_RESULT_CACHED) javaf &= 1;\
-		if(avahif & AVAHI_LOOKUP_RESULT_WIDE_AREA) javaf &= (1<<1);\
-		if(avahif & AVAHI_LOOKUP_RESULT_MULTICAST) javaf &= (1<<2);\
-		if(avahif & AVAHI_LOOKUP_RESULT_LOCAL) javaf &= (1<<3);\
-		if(avahif & AVAHI_LOOKUP_RESULT_OUR_OWN) javaf &= (1<<4);\
-		if(avahif & AVAHI_LOOKUP_RESULT_STATIC) javaf &= (1<<5);\
-	}while(0)
-
-// jstring to const char* helpers
-#define GET_UTF_STR(cstr, jstr, e, ret) \
-	do {\
-		if (jstr!=NULL){\
-			cstr = (*e)->GetStringUTFChars(e, jstr, NULL);\
-			if (cstr==NULL)\
-			{\
-				dprint("error getting UTF string\n");\
-				THROW_EXCEPTION(e, JNI_EXCP, "error getting UTF string");\
-				return ret;\
-			}\
-		} else {\
-			cstr=NULL;\
-		}\
-	} while(0)
-#define GET_UTF_STR_JUMP(cstr, jstr, e, bail) \
-	do {\
-		if (jstr!=NULL){\
-			cstr = (*e)->GetStringUTFChars(e, jstr, NULL);\
-			if (cstr==NULL)\
-			{\
-				dprint("error getting UTF string\n");\
-				goto bail;\
-			}\
-		} else {\
-			cstr=NULL;\
-		}\
-	} while(0)
-#define PUT_UTF_STR(cstr, jstr, e) if (jstr!=NULL && cstr!=NULL) (*e)->ReleaseStringUTFChars(e, jstr, cstr);
-
 #define CHECK_N_RET(func, result) \
 	dprint(#func " returned %d %s\n", result, (result<0)?avahi_strerror(result):"");\
 	return result;
@@ -178,10 +99,10 @@
  */
 struct avahi4j_client {
 	AvahiThreadedPoll 	*pollLoop;
-	AvahiClient 			*client;
-	JavaVM 					*jvm;
-	jmethodID				clientCallbackDispatch;
-	jobject					clientObject;
+	AvahiClient 		*client;
+	JavaVM 				*jvm;
+	jmethodID			clientCallbackDispatch;
+	jobject				clientObject;
 };
 
 struct avahi4j_entry_group {

@@ -167,7 +167,7 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_is_1group_1empty(JNIEnv *e, jobje
 }
 
 JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1txt_1records
-			(JNIEnv *e, jobject t, jlong ptr, jint interfaceNum, jobject proto,
+			(JNIEnv *e, jobject t, jlong ptr, jint interfaceNum, jint proto,
 					jstring name, jstring type, jstring domain, jstring host,
 					jint port, jarray txtRecord, jint length){
 	dprint("[LOG] Entering %s\n", __PRETTY_FUNCTION__);
@@ -184,7 +184,7 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1txt_1records
 	uint16_t avahi_port = (uint16_t) port;
 
 	// translate the Protocol Enum to an AvahiProtocol
-	GET_AVAHI_PROTO(avahi_proto, proto, e, -1);
+	GET_AVAHI_PROTO(avahi_proto, proto);
 
 	// go through the list of TXT  record and add them to the AvahiStringList
 	for(i=0; i<length; i++) {
@@ -226,7 +226,7 @@ bail:
 }
 
 JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1subtype(
-			JNIEnv *e, jobject t, jlong ptr, int interfaceNum, jobject proto,
+			JNIEnv *e, jobject t, jlong ptr, int interfaceNum, jint proto,
 			jstring name, jstring type, jstring domain, jstring subtype) {
 	dprint("[LOG] Entering %s\n", __PRETTY_FUNCTION__);
 
@@ -234,7 +234,7 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1subtype(
 	AvahiIfIndex avahi_if = GET_AVAHI_IF_IDX(interfaceNum);
 	AvahiProtocol avahi_proto;
 	const char *avahi_name=NULL, *avahi_type=NULL, *avahi_domain=NULL, *avahi_subtype=NULL;
-	GET_AVAHI_PROTO(avahi_proto, proto, e, -1);
+	GET_AVAHI_PROTO(avahi_proto, proto);
 	int result;
 
 	// get UTF strings (domain may be null)
@@ -259,7 +259,7 @@ bail:
 }
 
 JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_update_1service_1txt_1records
-			(JNIEnv *e, jobject t, jlong ptr, jint interfaceNum, jobject proto,
+			(JNIEnv *e, jobject t, jlong ptr, jint interfaceNum, jint proto,
 					jstring name, jstring type, jstring domain, jarray txtRecord,
 					jint length){
 	dprint("[LOG] Entering %s\n", __PRETTY_FUNCTION__);
@@ -275,7 +275,7 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_update_1service_1txt_1records
 	int result, i;
 
 	// translate the Protocol Enum to an AvahiProtocol
-	GET_AVAHI_PROTO(avahi_proto, proto, e, -1);
+	GET_AVAHI_PROTO(avahi_proto, proto);
 
 	// go through the list of TXT  record and add them to the AvahiStringList
 	for(i=0; i<length; i++) {

@@ -180,6 +180,15 @@
 		</java>
 	</target>
 	
+	<target name="test-browser" depends="jar,jnilib">
+		<java classname="avahi4j.examples.TestServiceBrowser" fork="true" failonerror="true">
+			<classpath>
+				<pathelement location="${project.jar.file}"/>
+			</classpath>
+			<jvmarg value="-Djava.library.path=."/>
+		</java>
+	</target>
+	
 	<target name="clean">
 		<exec executable="make">
 			<arg line="-C ${project.src} clean" />

@@ -22,7 +22,9 @@ public class Avahi4JConstants {
 	public final static int LOOKUP_NO_ADDRESS = 1 << 1;
 	public final static int LOOKUP_FLAGS_MAX = (1 << 2) -1 ;
 
-	
+	/**
+	 * 
+	 */
 	public final static int LOOKUP_RESULT_CACHED = 1;
 	public final static int LOOKUP_RESULT_WIDE_AREA = 1 << 1;
 	public final static int LOOKUP_RESULT_MULTICAST = 1 << 2;
@@ -31,6 +33,23 @@ public class Avahi4JConstants {
 	public final static int LOOKUP_RESULT_STATIC = 1 << 5;
 	public final static int LOOKUP_RESULT_FLAGS_MAX = (1 << 6)-1;
 	
+	public final static String lookupResultToString(int result){
+		String s="";
+		if ((result & LOOKUP_RESULT_CACHED)!=0)
+			s += "CACHED ";
+		if ((result & LOOKUP_RESULT_WIDE_AREA)!=0)
+			s += "Wide-area DNS ";
+		if ((result & LOOKUP_RESULT_MULTICAST)!=0)
+			s += "Multicast DNS ";
+		if ((result & LOOKUP_RESULT_LOCAL)!=0)
+			s += "Local ";
+		if ((result & LOOKUP_RESULT_OUR_OWN)!=0)
+			s += "Our own ";
+		if ((result & LOOKUP_RESULT_STATIC)!=0)
+			s += "Static ";
+		
+		return s.trim();
+	}
 	public enum Protocol {
 		INET,
 		INET6,

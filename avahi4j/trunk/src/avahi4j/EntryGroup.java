@@ -120,7 +120,7 @@ public class EntryGroup {
 	 * @return the raw result from avahi_entry_group_add_service()
 	 */
 	private native int add_service_txt_records(long o, int interfaceNum, 
-			Protocol proto, String name, String type, String domain, 
+			int proto, String name, String type, String domain, 
 			String host, int port, String txtRecord[], int recordNum);
 	/**
 	 * This method test if the avahi entry group is empty
@@ -135,7 +135,7 @@ public class EntryGroup {
 	 * @return the raw result from avahi_entry_group_add_service_subtype()
 	 */
 	private native int add_service_subtype(long o, int interfaceNum, 
-			Protocol proto, String name, String type, String domain, 
+			int proto, String name, String type, String domain, 
 			String subtype);
 	/**
 	 * This method update a existing service and its TXT record
@@ -151,7 +151,7 @@ public class EntryGroup {
 	 * @return the raw result from avahi_entry_group_update_service_txt()
 	 */
 	private native int update_service_txt_records(long o, int interfaceNum, 
-			Protocol proto, String name, String type, String domain, 
+			int proto, String name, String type, String domain, 
 			String txtRecord[], int recordNum);
 	
 	/**
@@ -276,7 +276,7 @@ public class EntryGroup {
 		int numRecords = txtRecord.size();
 		
 		return add_service_txt_records(avahi4j_group_entry_ptr, interfaceNum, 
-				proto, name, type, domain, host, port,
+				proto.ordinal(), name, type, domain, host, port,
 				txtRecord.toArray(new String[0]), numRecords);
 	}
 	
@@ -305,8 +305,8 @@ public class EntryGroup {
 		if (type==null || subtype==null)
 			return Avahi4JConstants.AVAHI_ERR_INVALID_SERVICE_SUBTYPE;
 		
-		return add_service_subtype(avahi4j_group_entry_ptr, interfaceNum, proto,
-				name, type, domain, subtype);
+		return add_service_subtype(avahi4j_group_entry_ptr, interfaceNum, 
+				proto.ordinal(), name, type, domain, subtype);
 	}
 	
 	/**
@@ -343,7 +343,7 @@ public class EntryGroup {
 		int numRecords = txtRecord.size();
 		
 		return update_service_txt_records(avahi4j_group_entry_ptr, interfaceNum, 
-				proto, name, type, domain, txtRecord.toArray(new String[0]),
+				proto.ordinal(), name, type, domain, txtRecord.toArray(new String[0]),
 				numRecords);
 	}
 	
