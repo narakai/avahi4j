@@ -19,7 +19,7 @@ endif
 
 LIB := libavahi4j.so
 OBJ := avahi4j_Client.o avahi4j_EntryGroup.o avahi4j_Avahi4JConstants.o thread-watch.o\
-		avahi4j_ServiceBrowser.o
+		avahi4j_ServiceBrowser.o avahi4j_ServiceResolver.o
 
 CC := gcc
 INCLUDES := -I. -I$(JDK_HOME)/include -I$(JDK_HOME)/include/linux/ -I$(AVAHI_COMMON_INCLUDE)

@@ -119,4 +119,11 @@ struct avahi4j_service_browser {
 	jobject				browserObject;
 };
 
+struct avahi4j_service_resolver {
+	AvahiServiceResolver 	*resolver;
+	JavaVM 					*jvm;
+	jmethodID				resolverCallbackDispatch;
+	jobject					resolverObject;
+};
+
 #endif /* COMMON_H_ */
