@@ -26,6 +26,7 @@
 #include <avahi-client/publish.h>
 #include <avahi-common/address.h>
 #include <avahi-common/error.h>
+#include <avahi-common/simple-watch.h>
 #include <string.h>
 
 // use fixed local copy of thread-watch since Avahi's provided one has a bug
@@ -124,6 +125,15 @@ struct avahi4j_service_resolver {
 	JavaVM 					*jvm;
 	jmethodID				resolverCallbackDispatch;
 	jobject					resolverObject;
+	jclass					stringClass;
+};
+
+struct AvahiThreadedPoll {
+    AvahiSimplePoll *simple_poll;
+    pthread_t thread_id;
+    pthread_mutex_t mutex;
+    int thread_running;
+    int retval;
 };
 
 #endif /* COMMON_H_ */

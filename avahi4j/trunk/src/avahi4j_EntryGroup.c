@@ -16,6 +16,7 @@
 *
 */
 #include <avahi-common/alternative.h>
+#include <avahi-common/malloc.h>
 #include <avahi-common/strlst.h>
 #include <jni.h>
 #include <stdint.h>
@@ -174,7 +175,7 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1txt_1records
 
 	struct avahi4j_entry_group *group = (struct avahi4j_entry_group *) (uintptr_t) ptr;
 
-	AvahiIfIndex avahi_if = GET_AVAHI_IF_IDX(interfaceNum);
+	AvahiIfIndex avahi_if;
 	AvahiProtocol avahi_proto;
 	const char *avahi_name=NULL, *avahi_type=NULL, *avahi_domain=NULL, *avahi_host=NULL;
 	AvahiStringList *list = NULL;
@@ -182,6 +183,9 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1txt_1records
 	const char* record;
 	int result, i;
 	uint16_t avahi_port = (uint16_t) port;
+
+	// translate  interface num
+	GET_AVAHI_IF_IDX(avahi_if, interfaceNum);
 
 	// translate the Protocol Enum to an AvahiProtocol
 	GET_AVAHI_PROTO(avahi_proto, proto);
@@ -231,11 +235,14 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_add_1service_1subtype(
 	dprint("[LOG] Entering %s\n", __PRETTY_FUNCTION__);
 
 	struct avahi4j_entry_group *group = (struct avahi4j_entry_group *) (uintptr_t) ptr;
-	AvahiIfIndex avahi_if = GET_AVAHI_IF_IDX(interfaceNum);
+	AvahiIfIndex avahi_if;
 	AvahiProtocol avahi_proto;
 	const char *avahi_name=NULL, *avahi_type=NULL, *avahi_domain=NULL, *avahi_subtype=NULL;
-	GET_AVAHI_PROTO(avahi_proto, proto);
 	int result;
+
+	// translate if index and protocol
+	GET_AVAHI_IF_IDX(avahi_if, interfaceNum);
+	GET_AVAHI_PROTO(avahi_proto, proto);
 
 	// get UTF strings (domain may be null)
 	GET_UTF_STR_JUMP(avahi_name, name, e, bail);
@@ -266,7 +273,7 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_update_1service_1txt_1records
 
 	struct avahi4j_entry_group *group = (struct avahi4j_entry_group *) (uintptr_t) ptr;
 
-	AvahiIfIndex avahi_if = GET_AVAHI_IF_IDX(interfaceNum);
+	AvahiIfIndex avahi_if;
 	AvahiProtocol avahi_proto;
 	const char *avahi_name=NULL, *avahi_type=NULL, *avahi_domain=NULL;
 	AvahiStringList *list = NULL;
@@ -274,8 +281,9 @@ JNIEXPORT jint JNICALL Java_avahi4j_EntryGroup_update_1service_1txt_1records
 	const char* record;
 	int result, i;
 
-	// translate the Protocol Enum to an AvahiProtocol
+	// translate the Protocol Enum and interface index
 	GET_AVAHI_PROTO(avahi_proto, proto);
+	GET_AVAHI_IF_IDX(avahi_if, interfaceNum);
 
 	// go through the list of TXT  record and add them to the AvahiStringList
 	for(i=0; i<length; i++) {

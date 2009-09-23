@@ -20,14 +20,24 @@
 #ifndef JNI_HELPERS_H_
 #define JNI_HELPERS_H_
 
+#include <pthread.h>
 
 // acquire / release avahi client/poll mutex
-#define AVAHI_LOCK(client) avahi_threaded_poll_lock(client->pollLoop)
-#define AVAHI_UNLOCK(client) avahi_threaded_poll_unlock(client->pollLoop)
+#define AVAHI_LOCK(client) do{\
+		if(pthread_equal(pthread_self(), client->pollLoop->thread_id)==0)\
+			avahi_threaded_poll_lock(client->pollLoop);\
+	}while(0)
+#define AVAHI_UNLOCK(client)  do{\
+		if(pthread_equal(pthread_self(), client->pollLoop->thread_id)==0)\
+			avahi_threaded_poll_unlock(client->pollLoop);\
+	}while(0)
 
 // translate an interface index to an avahi interface index and back
-#define GET_AVAHI_IF_IDX(i) (i==-1)?AVAHI_IF_UNSPEC:i
-#define GET_JAVA_IF_IDX(avahi_if_idx) (avahi_if_idx==AVAHI_IF_UNSPEC)?-1:avahi_if_idx
+#define GET_AVAHI_IF_IDX(avahi_if_idx, jif_idx) \
+	avahi_if_idx = (jif_idx==-1)?AVAHI_IF_UNSPEC:jif_idx
+
+#define GET_JAVA_IF_IDX(avahi_if_idx, jif_idx) \
+	jif_idx = (avahi_if_idx==AVAHI_IF_UNSPEC)?-1:avahi_if_idx
 
 // translate a Avahi4JConstant.Protocol enum ordinal to an AvahiProtocol
 #define GET_AVAHI_PROTO(avahip, javap) do {\
@@ -87,13 +97,13 @@
 			javae=2;\
 			break;\
 		case AVAHI_BROWSER_ALL_FOR_NOW:\
-			javae=4;\
+			javae=3;\
 			break;\
 		case AVAHI_BROWSER_FAILURE:\
-			javae=5;\
+			javae=4;\
 			break;\
 		default:\
-			javae=5;\
+			javae=4;\
 		};\
 	}while(0)
 
@@ -143,5 +153,9 @@
 	if (jstr!=NULL && cstr!=NULL) \
 		(*e)->ReleaseStringUTFChars(e, jstr, cstr);
 
+#define GET_JSTRING_JUMP(cstr, jstr, e, bail) do{\
+		if((jstr = (*e)->NewStringUTF(e, cstr))==NULL)\
+			goto bail;\
+	}while(0)
 
 #endif /* JNI_HELPERS_H_ */

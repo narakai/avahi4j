@@ -51,4 +51,12 @@ public class Address {
 	public Protocol getProtocol() {
 		return protocol;
 	}
+	
+	public String toString() {
+		if(protocol==Protocol.INET){
+			return "IPv4: "+address;
+		} else {
+			return "IPv6: "+address;
+		}
+	}
 }

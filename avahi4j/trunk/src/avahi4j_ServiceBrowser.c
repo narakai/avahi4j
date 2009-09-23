@@ -37,7 +37,7 @@ static void browser_callback(AvahiServiceBrowser *b, AvahiIfIndex if_idx,
 	jtype = (*e)->NewStringUTF(e, type);
 	jdomain = (*e)->NewStringUTF(e, domain);
 	GET_JAVA_PROTO(protocol, jproto);
-	jif_idx = GET_JAVA_IF_IDX(if_idx);
+	GET_JAVA_IF_IDX(if_idx,jif_idx);
 	GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
 	GET_JAVA_BROWSER_EVT(event, jevent);
 
@@ -68,7 +68,7 @@ JNIEXPORT jlong JNICALL Java_avahi4j_ServiceBrowser_initBrowser(JNIEnv *e, jobje
 	GET_UTF_STR(domain, jdomain, e, 0);
 	GET_AVAHI_LOOKUP_FLAGS(flags, jflags);
 	GET_AVAHI_PROTO(proto, jproto);
-	if_idx = GET_AVAHI_IF_IDX(jif_idx);
+	GET_AVAHI_IF_IDX(if_idx, jif_idx);
 
 
 	// create struct service browser

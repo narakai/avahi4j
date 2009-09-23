@@ -36,17 +36,17 @@ public class Avahi4JConstants {
 	public final static String lookupResultToString(int result){
 		String s="";
 		if ((result & LOOKUP_RESULT_CACHED)!=0)
-			s += "CACHED ";
+			s += "'Cached' ";
 		if ((result & LOOKUP_RESULT_WIDE_AREA)!=0)
-			s += "Wide-area DNS ";
+			s += "'Wide-area DNS' ";
 		if ((result & LOOKUP_RESULT_MULTICAST)!=0)
-			s += "Multicast DNS ";
+			s += "'Multicast DNS' ";
 		if ((result & LOOKUP_RESULT_LOCAL)!=0)
-			s += "Local ";
+			s += "'Local' ";
 		if ((result & LOOKUP_RESULT_OUR_OWN)!=0)
-			s += "Our own ";
+			s += "'Our own' ";
 		if ((result & LOOKUP_RESULT_STATIC)!=0)
-			s += "Static ";
+			s += "'Static' ";
 		
 		return s.trim();
 	}

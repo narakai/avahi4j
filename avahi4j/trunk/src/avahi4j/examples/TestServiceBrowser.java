@@ -18,32 +18,41 @@
 package avahi4j.examples;
 
 import java.io.IOException;
+import java.util.List;
 
+import avahi4j.Address;
 import avahi4j.Avahi4JConstants;
 import avahi4j.Client;
 import avahi4j.IClientCallback;
 import avahi4j.IServiceBrowserCallback;
+import avahi4j.IServiceResolverCallback;
 import avahi4j.ServiceBrowser;
+import avahi4j.ServiceResolver;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.Client.State;
 import avahi4j.ServiceBrowser.ServiceBrowserEvent;
+import avahi4j.ServiceResolver.ServiceResolverEvent;
 import avahi4j.exceptions.Avahi4JException;
 
-public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallback {
+public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallback, IServiceResolverCallback {
 	private Client client;
 	private ServiceBrowser browser;
+	private ServiceResolver resolver;
 	
 	public TestServiceBrowser() throws Avahi4JException {
 		client = new Client(this);
 		client.start();
+		resolver = null;
 	}
 	
 	public void browse() throws Avahi4JException {
 		browser = client.createServiceBrowser(this, Avahi4JConstants.AnyInterface,
-				Protocol.ANY , "_daap._tcp", null, 0);
+				Protocol.ANY , "_test._tcp", null, 0);
 	}
 	
 	public void stop() {
+		if(resolver!=null)
+			resolver.release();
 		browser.release();
 		client.stop();
 		client.release();
@@ -58,10 +67,57 @@ public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallb
 	public void serviceCallback(int interfaceNum, Protocol proto,
 			ServiceBrowserEvent browserEvent, String name, String type,
 			String domain, int lookupResultFlag) {
-		System.out.println("Service: interface: "+interfaceNum + " protocol :"
-				+ proto +" event: " + browserEvent + " name: "+name+ " type:"
-				+ type+ " domain: "+domain+ " flags: "+
-				Avahi4JConstants.lookupResultToString(lookupResultFlag));
+		
+		if(browserEvent==ServiceBrowserEvent.FAILURE){
+			System.out.println("Failure to browse");
+		} else if(browserEvent==ServiceBrowserEvent.NEW){
+			System.out.println(" ****** Service ADDED:\nInterface: "+interfaceNum + "\nProtocol :"
+					+ proto +"\nEvent: " + browserEvent + "\nName: "+name+ "\nType:"
+					+ type+ "\nDomain: "+domain+ "\nFlags: " 
+					+ Avahi4JConstants.lookupResultToString(lookupResultFlag)
+					+ "\n");
+			
+			try {
+				resolver = client.createServiceResolver(this, interfaceNum, proto, name, type, 
+						domain, Protocol.ANY, 0);
+			} catch (Avahi4JException e) {
+				System.out.println("error creating resolver");
+				e.printStackTrace();
+				resolver = null;
+			}
+		} else if(browserEvent==ServiceBrowserEvent.CACHE_EXHAUSTED ) {
+			System.out.println(" ****** Cache exhausted");
+		} else if(browserEvent==ServiceBrowserEvent.NO_MORE) {
+			System.out.println(" ****** No more entries");
+		} else // browserEvent=ServiceBrowserEvent.REMOVED
+		{
+			System.out.println(" ****** Service REMOVED:\nInterface: "
+					+ interfaceNum + "\nProtocol :"
+					+ proto +"\nEvent: " + browserEvent + "\nName: "+name
+					+ "\nType:"	+ type+ "\nDomain: "+domain+ "\nFlags: "
+					+ Avahi4JConstants.lookupResultToString(lookupResultFlag)
+					+"\n");
+			
+		}
+	}
+
+	@Override
+	public void resolverCallback(int interfaceNum, Protocol proto,
+			ServiceResolverEvent resolverEvent, String name, String type,
+			String domain, String hostname, Address address, int port,
+			List<String> txtRecords, int lookupResultFlag) {
+
+		if(resolverEvent==ServiceResolverEvent.RESOLVER_FOUND) {
+			System.out.println(" ******  Service RESOLVED:\nInterface: "
+					+ interfaceNum + "\nProtocol :"	+ proto +"\nEvent: "
+					+ resolverEvent + "\nName: "+name+ "\nType: "
+					+ type+ "\nDomain: "+domain+ "\nAddress: "+ address 
+					+ "\nFlags: "
+					+ Avahi4JConstants.lookupResultToString(lookupResultFlag)
+					+ "\n");
+		} else {
+			System.out.println("Failure to resolve name");
+		}
 	}
 	
 	public static void main(String args[]) throws Avahi4JException, IOException{

@@ -235,6 +235,18 @@ public class Client {
 				proto, type, domain, lookupFlags);
 	}
 	
+	public synchronized ServiceResolver createServiceResolver(
+			IServiceResolverCallback callback, int ifNum, Protocol proto, 
+			String name, String type, String domain, Protocol addressProtocol, 
+			int lookupFlags) throws Avahi4JException{
+		
+		if (callback==null || name==null || type==null)
+			throw new NullPointerException("neither the callback nor the type nor the name can be null");
+		
+		return new ServiceResolver(avahi4j_client_ptr, callback, ifNum, proto, 
+				name, type, domain, addressProtocol, lookupFlags);
+	}
+	
 	/**
 	 * Called from JNI context when a callback from avahi is received
 	 * and needs to be dispatched to the registered {@link IClientCallback}

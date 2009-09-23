@@ -51,9 +51,10 @@ public class ServiceResolver {
 	/**
 	 * This method releases the service resolver
 	 * @param avahi4j_resolver_ptr the resolver to be released
+	 * @param lookupFlags lookup flags (see Avahi4JConstants.LOOKUP_* )
 	 * @return the raw result from avahi_service_resolver_free
 	 */
-	private native int release_resolver(long avahi4j_resolver_ptr);
+	private native int release(long avahi4j_resolver_ptr);
 	
 	ServiceResolver(long avahi4j_client_ptr, IServiceResolverCallback callback,
 			int ifNum, Protocol proto, String name,	String type, String domain, 
@@ -66,7 +67,7 @@ public class ServiceResolver {
 	}
 	
 	public void release() {
-		release_resolver(avahi4j_resolver_ptr);
+		release(avahi4j_resolver_ptr);
 	}
 	
 	/**
@@ -75,13 +76,14 @@ public class ServiceResolver {
 	@SuppressWarnings("unused")
 	private void dispatchCallback(int interfaceNum, int proto, int resolverEvent,
 			String name, String type, String domain, String hostname, 
-			Address address, int port, String txtRecords[], int lookupResultFlag){
+			String address, int addressType, int port, String txtRecords[], int lookupResultFlag){
 		
 		Vector<String> list = new Vector<String>(txtRecords.length);
 		list.copyInto(txtRecords);
 		
 		resolverCallback.resolverCallback(interfaceNum, Protocol.values()[proto],
 				ServiceResolverEvent.values()[resolverEvent], name, type, domain,
-				hostname, address, port, list, lookupResultFlag);
+				hostname, new Address(address, Protocol.values()[addressType]) ,
+				port, list, lookupResultFlag);
 	}
 }
