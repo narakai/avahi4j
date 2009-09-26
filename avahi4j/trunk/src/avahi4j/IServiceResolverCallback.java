@@ -17,13 +17,12 @@
  */
 package avahi4j;
 
-import java.util.List;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.ServiceResolver.ServiceResolverEvent;
 
 public interface IServiceResolverCallback {
-	public void resolverCallback(int interfaceNum, Protocol proto, 
-			ServiceResolverEvent resolverEvent,	String name, String type, 
-			String domain, String hostname, Address address, int port, 
-			List<String> txtRecords,int lookupResultFlag);
+	public void resolverCallback(ServiceResolver resolver, int interfaceNum,
+			Protocol proto,	ServiceResolverEvent resolverEvent,	String name,
+			String type, String domain, String hostname, Address address, 
+			int port, String txtRecords[],int lookupResultFlag);
 }

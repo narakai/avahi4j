@@ -30,13 +30,13 @@ import avahi4j.exceptions.Avahi4JException;
 
 
 
-public class TestClient implements IClientCallback, IEntryGroupCallback{
+public class TestServicePublish implements IClientCallback, IEntryGroupCallback{
 	
 	private Client client;
 	private EntryGroup group;
 	private Vector<String> records;
 	
-	public TestClient() throws Avahi4JException {
+	public TestServicePublish() throws Avahi4JException {
 		records = new Vector<String>();
 		client = new Client(this);
 		client.start();
@@ -66,17 +66,13 @@ public class TestClient implements IClientCallback, IEntryGroupCallback{
 			
 			// try with an alternate name
 			String newName = EntryGroup.findAlternativeServiceName("TestService");
-			System.out.println("\n\nAdding new service to group");
+			System.out.println("\n\nRe-trying with new service name: "+newName);
 			result = group.addService(Avahi4JConstants.AnyInterface, Protocol.ANY,
 					newName, "_test._tcp", null, null, 1515, records);
 			if (result!=Avahi4JConstants.AVAHI_OK)
 				System.out.println("Error adding service to group: "+
 						Avahi4JConstants.getErrorString(result));
 		}
-
-		// sleep 3 seconds
-		Thread.sleep(3000);
-		System.out.println("\n\n");
 		
 		// commit service
 		System.out.println("Committing group");
@@ -94,24 +90,29 @@ public class TestClient implements IClientCallback, IEntryGroupCallback{
 		
 		// update records
 		records.remove("record1=1");
-		records.add("newrecord1=11");
+		records.add("UpdatedRecord2=NewUpdatedValue2");
 		System.out.println("\n\nUpdating service");
 		result = group.updateService(Avahi4JConstants.AnyInterface, Protocol.ANY,
 				"TestService", "_test._tcp", null, records);
 		if(result!=Avahi4JConstants.AVAHI_OK){
 			System.out.println("Error updating service: "+ Avahi4JConstants.getErrorString(result));
+		} else {
+			System.out.println("done");
 		}
-
-		// sleep 3 seconds
-		Thread.sleep(3000);
-		System.out.println("\n\n");
+	}
+	
+	public void resetService(){
+		int result;
 		
 		// reset group
 		System.out.println("Resetting group");
 		result = group.reset();
-		if(result!=Avahi4JConstants.AVAHI_OK) 
+		if(result!=Avahi4JConstants.AVAHI_OK) { 
 			System.out.println("Error resetting group: "
 					+Avahi4JConstants.getErrorString(result));
+		} else {
+			System.out.println("done");
+		}
 	}
 	
 	public void stop(){
@@ -132,13 +133,16 @@ public class TestClient implements IClientCallback, IEntryGroupCallback{
 
 	
 	public static void main(String args[]) throws Exception{
-		TestClient t = new TestClient();
+		TestServicePublish t = new TestServicePublish();
 		System.out.println("Press <Enter>");
 		System.in.read();
 		t.addService();
 		System.out.println("Press <Enter>");
 		System.in.read();
 		t.updateService();
+		System.out.println("Press <Enter>");
+		System.in.read();
+		t.resetService();
 		System.out.println("Press <Enter>");
 		System.in.read();
 		t.stop();

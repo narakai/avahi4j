@@ -44,8 +44,11 @@
 		<echo message=" uninstall:         Uninstall avahi4j.jar and the JNI lib (must be root)"/>
 		<echo message=" install-doc:       Build and install JavaDoc (must be root)"/>
 		<echo message=" uninstall-doc:     Uninstall JavaDoc (must be root)"/>
-		<echo message=" clean:             Remove all build generated files"/>		
+		<echo message=" clean:             Remove all build generated files"/>
 		<echo message=" ********************************************************" />
+		<echo message=" test-publish:          Runs a service publishing test application"/>
+		<echo message=" test-srv-browser:      Runs a service browser test application"/>
+		<echo message=" test-record-browser:   Runs a record browser test application"/>
 		<echo message="" />
 		<echo message=""/>
 		<echo message=""/>
@@ -122,7 +125,7 @@
 	<target name="jar" depends="compile">
 		<jar jarfile="${project.dir}/${project.jar.file}">
 			<manifest>
-				<attribute name="Main-Class" value="avahi4j.examples.TestClient"/>
+				<attribute name="Main-Class" value="${project.example.servicepublish}"/>
 			</manifest>
 			<fileset dir="${project.classes}">
 				<include name="**"/>
@@ -136,7 +139,7 @@
 	<target name="jar-debug" depends="compile-debug">
 		<jar jarfile="${project.dir}/${project.jar.file}">
 		        <manifest>
-				<attribute name="Main-Class" value="avahi4j.examples.TestClient"/>
+				<attribute name="Main-Class" value="${project.example.servicepublish}"/>
 			</manifest>
 			<fileset dir="${project.classes}">
 				<include name="**"/>
@@ -150,7 +153,7 @@
 	<target name="jar-src" depends="compile">
 		<jar jarfile="${project.dir}/${project.jar.file}">
 			<manifest>
-				<attribute name="Main-Class" value="avahi4j.examples.TestClient"/>
+				<attribute name="Main-Class" value="${project.example.servicepublish}"/>
 			</manifest>
 			<fileset dir="${project.classes}">
 				<include name="**"/>
@@ -171,8 +174,8 @@
 		</javadoc>
 	</target>
 	
-	<target name="test-client" depends="jar,jnilib">
-		<java classname="avahi4j.examples.TestClient" fork="true" failonerror="true">
+	<target name="test-publish" depends="jar,jnilib">
+		<java classname="${project.example.servicepublish}" fork="true" failonerror="true">
 			<classpath>
 				<pathelement location="${project.jar.file}"/>
 			</classpath>
@@ -180,8 +183,17 @@
 		</java>
 	</target>
 	
-	<target name="test-browser" depends="jar,jnilib">
-		<java classname="avahi4j.examples.TestServiceBrowser" fork="true" failonerror="true">
+	<target name="test-srv-browser" depends="jar,jnilib">
+		<java classname="${project.example.servicebrowser}" fork="true" failonerror="true">
+			<classpath>
+				<pathelement location="${project.jar.file}"/>
+			</classpath>
+			<jvmarg value="-Djava.library.path=."/>
+		</java>
+	</target>
+	
+	<target name="test-record-browser" depends="jar,jnilib">
+		<java classname="${project.example.recordbrowser}" fork="true" failonerror="true">
 			<classpath>
 				<pathelement location="${project.jar.file}"/>
 			</classpath>

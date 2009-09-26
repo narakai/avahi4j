@@ -93,8 +93,7 @@ static void resolver_callback(AvahiServiceResolver *r, AvahiIfIndex interface,
 	// detach the jvm
 	(*resolver->jvm)->DetachCurrentThread(resolver->jvm);
 
-	bail:
-
+bail:
 	return;
 }
 
@@ -134,28 +133,28 @@ JNIEXPORT jlong JNICALL Java_avahi4j_ServiceResolver_init_1resolver(JNIEnv *e,
 			"dispatchCallback",
 			"(IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II[Ljava/lang/String;I)V");
     if (resolver->resolverCallbackDispatch == NULL) {
-         THROW_EXCEPTION(e, GENERIC_EXCP, "Unable to get callback dispatch method ID");
+         THROW_EXCEPTION(e, JNI_EXCP, "Unable to get callback dispatch method ID");
          goto bail;
     }
 
     // create global ref to our object
     resolver->resolverObject = (*e)->NewGlobalRef(e, t);
     if (resolver->resolverObject==NULL) {
-        THROW_EXCEPTION(e, GENERIC_EXCP, "Unable to create global ref to resolver object");
+        THROW_EXCEPTION(e, JNI_EXCP, "Unable to create global ref to resolver object");
         goto bail;
     }
 
     // get ref to string array class
     jclass string_class = (*e)->FindClass(e, "Ljava/lang/String;");
     if (string_class == NULL) {
-		THROW_EXCEPTION(e, GENERIC_EXCP, "Unable to get a string array class reference");
+		THROW_EXCEPTION(e, JNI_EXCP, "Unable to get a string array class reference");
 		goto bail;
     }
 
     // create global ref to the string array class ref
 	resolver->stringClass = (*e)->NewGlobalRef(e, string_class);
 	if (resolver->stringClass==NULL) {
-		THROW_EXCEPTION(e, GENERIC_EXCP, "Unable to create global ref to string array class");
+		THROW_EXCEPTION(e, JNI_EXCP, "Unable to create global ref to string array class");
 		goto bail;
 	}
 
@@ -170,7 +169,7 @@ JNIEXPORT jlong JNICALL Java_avahi4j_ServiceResolver_init_1resolver(JNIEnv *e,
 			proto, name, type, domain, address_proto, flags, resolver_callback,
 			resolver))) {
 		AVAHI_UNLOCK(client);
-		THROW_EXCEPTION(e, JNI_EXCP, "Error creating avahi resolver");
+		THROW_EXCEPTION(e, GENERIC_EXCP, "Error creating avahi resolver");
 		goto bail;
 	}
 	AVAHI_UNLOCK(client);

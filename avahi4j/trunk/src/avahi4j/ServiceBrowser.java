@@ -17,19 +17,12 @@
 */
 package avahi4j;
 
+import avahi4j.Avahi4JConstants.BrowserEvent;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
 
-public class ServiceBrowser {
-	public enum ServiceBrowserEvent {
-		NEW,
-		REMOVE,
-		CACHE_EXHAUSTED,
-		NO_MORE,
-		FAILURE
-	};
-	
+public final class ServiceBrowser {
 	/*
 	 * M E M B E R S
 	 */
@@ -40,7 +33,11 @@ public class ServiceBrowser {
 	/**
 	 * the group's callback object (cannot be null)
 	 */
-	IServiceBrowserCallback browserCallback;
+	private IServiceBrowserCallback browserCallback;
+	/**
+	 * flag indicating whether released() has been called already
+	 */
+	private boolean released;
 	
 	
 	/*
@@ -81,10 +78,8 @@ public class ServiceBrowser {
 	ServiceBrowser(IServiceBrowserCallback callback, long avahi4j_client_ptr,
 			int interfaceNum, Protocol proto, String type, String domain, 
 			int lookupFlags) throws Avahi4JException {
-		
-		if (type==null)
-			throw new NullPointerException("The service type can not be null");
-		
+
+		released = false;
 		browserCallback = callback;
 		avahi4j_service_browser_ptr =  initBrowser(avahi4j_client_ptr, interfaceNum,
 				proto.ordinal(), type, domain, lookupFlags);
@@ -93,8 +88,11 @@ public class ServiceBrowser {
 	/**
 	 * This method must be called when this browser is no longer needed.
 	 */
-	public void release() {
-		release(avahi4j_service_browser_ptr);
+	public synchronized void release() {
+		if(!released){
+			release(avahi4j_service_browser_ptr);
+			released = true;
+		}
 	}	
 	
 	
@@ -109,7 +107,7 @@ public class ServiceBrowser {
 			String name, String type, String domain, int flags){
 		
 		browserCallback.serviceCallback(interfaceNum, Protocol.values()[proto],
-				ServiceBrowserEvent.values()[browserEvent], name, type, domain,
+				BrowserEvent.values()[browserEvent], name, type, domain,
 				flags);
 	}
 }

@@ -17,20 +17,27 @@
 */
 package avahi4j;
 
-import java.util.Vector;
-
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
-public class ServiceResolver {
+public final class ServiceResolver {
 	public enum ServiceResolverEvent {
 		RESOLVER_FOUND,
 		RESOLVER_FAILURE
 	};
 	
+	
+	/*
+	 * M E M B E R S
+	 */
 	private long avahi4j_resolver_ptr;
 	private IServiceResolverCallback resolverCallback;
+	private boolean released;
 	
+	
+	/*
+	 * N A T I V E   M E T H O D S
+	 */
 	/**
 	 * this method creates an AvahiServiceResover object
 	 * @param avahi4j_client_ptr the avahi4j_client struct
@@ -56,18 +63,25 @@ public class ServiceResolver {
 	 */
 	private native int release(long avahi4j_resolver_ptr);
 	
+	
+	/*
+	 * M E T H O D S
+	 */
 	ServiceResolver(long avahi4j_client_ptr, IServiceResolverCallback callback,
 			int ifNum, Protocol proto, String name,	String type, String domain, 
 			Protocol addressProtocol, int lookupFlags) throws Avahi4JException {
 		
 		resolverCallback = callback;
-		
+		released = false;
 		avahi4j_resolver_ptr = init_resolver(avahi4j_client_ptr, ifNum, proto.ordinal(), 
 				name, type, domain, addressProtocol.ordinal(), lookupFlags);
 	}
 	
-	public void release() {
-		release(avahi4j_resolver_ptr);
+	public synchronized void release() {
+		if(!released){
+			release(avahi4j_resolver_ptr);
+			released = true;
+		}
 	}
 	
 	/**
@@ -78,12 +92,9 @@ public class ServiceResolver {
 			String name, String type, String domain, String hostname, 
 			String address, int addressType, int port, String txtRecords[], int lookupResultFlag){
 		
-		Vector<String> list = new Vector<String>(txtRecords.length);
-		list.copyInto(txtRecords);
-		
-		resolverCallback.resolverCallback(interfaceNum, Protocol.values()[proto],
+		resolverCallback.resolverCallback(this, interfaceNum, Protocol.values()[proto],
 				ServiceResolverEvent.values()[resolverEvent], name, type, domain,
 				hostname, new Address(address, Protocol.values()[addressType]) ,
-				port, list, lookupResultFlag);
+				port, txtRecords, lookupResultFlag);
 	}
 }

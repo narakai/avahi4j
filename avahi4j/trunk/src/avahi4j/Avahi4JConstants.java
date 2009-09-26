@@ -18,6 +18,32 @@
 package avahi4j;
 
 public class Avahi4JConstants {
+
+	public enum BrowserEvent {
+		NEW,
+		REMOVE,
+		CACHE_EXHAUSTED,
+		NO_MORE,
+		FAILURE
+	}
+	
+	public enum DNS_Class {
+		AVAHI_DNS_CLASS_IN
+	}
+	
+	public enum DNS_RRType{
+		A,
+		NS,
+		CNAME,
+		SOA,
+		PTR,
+		HINFO ,
+		MX,
+		TXT,
+		AAAA,
+		SRV
+	}
+	
 	public final static int LOOKUP_NO_TXT = 1;
 	public final static int LOOKUP_NO_ADDRESS = 1 << 1;
 	public final static int LOOKUP_FLAGS_MAX = (1 << 2) -1 ;
@@ -50,6 +76,7 @@ public class Avahi4JConstants {
 		
 		return s.trim();
 	}
+	
 	public enum Protocol {
 		INET,
 		INET6,

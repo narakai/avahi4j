@@ -17,10 +17,13 @@
 */
 package avahi4j;
 
-import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.Avahi4JConstants.BrowserEvent;
+import avahi4j.Avahi4JConstants.DNS_Class;
+import avahi4j.Avahi4JConstants.DNS_RRType;
+import avahi4j.Avahi4JConstants.Protocol;
 
-public interface IServiceBrowserCallback {
-	public void serviceCallback(int interfaceNum, Protocol proto, BrowserEvent browserEvent,
-			String name, String type, String domain, int lookupResultFlag);
+public interface IRecordBrowserCallback {
+	public void recordBrowserCallback(RecordBrowser browser, int interfaceNum,
+			Protocol proto,	BrowserEvent event,	String name,
+			DNS_Class clazz, DNS_RRType type, byte rdata[], int lookupResultFlags);
 }

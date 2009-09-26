@@ -128,6 +128,13 @@ struct avahi4j_service_resolver {
 	jclass					stringClass;
 };
 
+struct avahi4j_record_browser {
+	AvahiRecordBrowser	 	*browser;
+	JavaVM 					*jvm;
+	jmethodID				browserCallbackDispatch;
+	jobject					browserObject;
+};
+
 struct AvahiThreadedPoll {
     AvahiSimplePoll *simple_poll;
     pthread_t thread_id;

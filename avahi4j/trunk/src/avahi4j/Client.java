@@ -18,6 +18,8 @@
 
 package avahi4j;
 
+import avahi4j.Avahi4JConstants.DNS_Class;
+import avahi4j.Avahi4JConstants.DNS_RRType;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
@@ -245,6 +247,18 @@ public class Client {
 		
 		return new ServiceResolver(avahi4j_client_ptr, callback, ifNum, proto, 
 				name, type, domain, addressProtocol, lookupFlags);
+	}
+	
+	public synchronized RecordBrowser createRecordBrowser(
+			IRecordBrowserCallback callback, int interfaceIdx, Protocol proto, 
+			String name, DNS_Class clazz, DNS_RRType type, int lookupFlags) 
+				throws Avahi4JException{
+		
+		if (callback==null || name==null)
+			throw new NullPointerException("neither the callback nor the name can be null");
+		
+		return new RecordBrowser(avahi4j_client_ptr, callback, interfaceIdx, proto, 
+				name, clazz, type, lookupFlags);
 	}
 	
 	/**

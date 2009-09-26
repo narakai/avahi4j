@@ -119,6 +119,107 @@
 		};\
 	}while(0)
 
+#define TRANSLATE_DNS_CLASS(avahic, javac, toJava) do{\
+		if(toJava){\
+			switch (avahic){\
+			case AVAHI_DNS_CLASS_IN:\
+				javac=0;\
+				break;\
+			default:\
+				javac=0;\
+			};\
+		} else {\
+			switch (javac){\
+			case 0:\
+				avahic=AVAHI_DNS_CLASS_IN;\
+				break;\
+			default:\
+				avahic=AVAHI_DNS_CLASS_IN;\
+			};\
+		}\
+	}while(0)
+
+#define A2J_DNS_CLASS(avahic, javac) TRANSLATE_DNS_CLASS(avahic,javac,1)
+#define J2A_DNS_CLASS(avahic, javac) TRANSLATE_DNS_CLASS(avahic,javac,0)
+
+#define TRANSLATE_DNS_RR_TYPE(avahit, javat, toJava) do{\
+		if(toJava){\
+			switch(avahit){\
+			case AVAHI_DNS_TYPE_A:\
+				javat=0;\
+				break;\
+			case AVAHI_DNS_TYPE_NS:\
+				javat=1;\
+				break;\
+			case AVAHI_DNS_TYPE_CNAME:\
+				javat=2;\
+				break;\
+			case AVAHI_DNS_TYPE_SOA:\
+				javat=3;\
+				break;\
+			case AVAHI_DNS_TYPE_PTR:\
+				javat=4;\
+				break;\
+			case AVAHI_DNS_TYPE_HINFO:\
+				javat=5;\
+				break;\
+			case AVAHI_DNS_TYPE_MX:\
+				javat=6;\
+				break;\
+			case AVAHI_DNS_TYPE_TXT:\
+				javat=7;\
+				break;\
+			case AVAHI_DNS_TYPE_AAAA:\
+				javat=8;\
+				break;\
+			case AVAHI_DNS_TYPE_SRV:\
+				javat=9;\
+				break;\
+			default:\
+				javat=0;\
+				break;\
+			};\
+		} else {\
+			switch(javat){\
+			case 0:\
+				avahit= AVAHI_DNS_TYPE_A;\
+				break;\
+			case 1:\
+				avahit= AVAHI_DNS_TYPE_NS;\
+				break;\
+			case 2:\
+				avahit= AVAHI_DNS_TYPE_CNAME;\
+				break;\
+			case 3:\
+				avahit= AVAHI_DNS_TYPE_SOA;\
+				break;\
+			case 4:\
+				avahit= AVAHI_DNS_TYPE_PTR;\
+				break;\
+			case 5:\
+				avahit= AVAHI_DNS_TYPE_HINFO;\
+				break;\
+			case 6:\
+				avahit= AVAHI_DNS_TYPE_MX;\
+				break;\
+			case 7:\
+				avahit= AVAHI_DNS_TYPE_TXT;\
+				break;\
+			case 8:\
+				avahit= AVAHI_DNS_TYPE_AAAA;\
+				break;\
+			case 9:\
+				avahit= AVAHI_DNS_TYPE_SRV;\
+				break;\
+			default:\
+				avahit= AVAHI_DNS_TYPE_A;\
+				break;\
+			};\
+		}\
+	}while(0)
+#define A2J_DNS_RR_TYPE(avahit, javat) TRANSLATE_DNS_RR_TYPE(avahit, javat, 1)
+#define J2A_DNS_RR_TYPE(avahit, javat) TRANSLATE_DNS_RR_TYPE(avahit, javat, 0)
+
 // jstring to const char* helpers
 #define GET_UTF_STR(cstr, jstr, e, ret) \
 	do {\
