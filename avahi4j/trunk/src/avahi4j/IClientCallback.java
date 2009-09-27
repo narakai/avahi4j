@@ -20,8 +20,8 @@ package avahi4j;
 import avahi4j.Client.State;
 
 /**
- * Classes implementing this interface have the {@link #stateChanged()} method
- * called whenever the associated client changes state.
+ * Classes implementing this interface can be notified when the state of a 
+ * {@link Client} changes.  
  * @author gilles
  *
  */

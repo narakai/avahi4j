@@ -15,35 +15,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
-package avahi4j.exceptions;
 
 /**
- * This class of exception is thrown when an error occured in the JNI code.
- * This should not happen, please report this error to the Avahi4J mailing list.
- * See the Avahi4J web site at http://avahi4j.googlecode.com 
- * @author gilles
- *
+ * This package contains sample applications demonstrating how to use Avahi4J. 
  */
-public class JNIException extends RuntimeException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4071326677467146992L;
-
-	public JNIException() {
-	}
-
-	public JNIException(String arg0) {
-		super(arg0);
-	}
-
-	public JNIException(Throwable arg0) {
-		super(arg0);
-	}
-
-	public JNIException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
-	}
-
-}
+package avahi4j.examples;

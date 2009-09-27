@@ -28,14 +28,34 @@ import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.EntryGroup.State;
 import avahi4j.exceptions.Avahi4JException;
 
-
-
+/**
+ * This example class shows how to publish a service and some TXT records, and
+ * how to update these.
+ * @author gilles
+ *
+ */
 public class TestServicePublish implements IClientCallback, IEntryGroupCallback{
 	
+	/**
+	 * The Avahi4J {@link Client} object
+	 */
 	private Client client;
+	
+	/**
+	 * The service's {@link EntryGroup}, which contains the service's details.
+	 */
 	private EntryGroup group;
+	
+	/**
+	 * A list of TXT records for this service.
+	 */
 	private Vector<String> records;
 	
+	/**
+	 * This method builds the test object.
+	 * @throws Avahi4JException if there is an error creating or starting the 
+	 * Avahi4J {@link Client}.
+	 */
 	public TestServicePublish() throws Avahi4JException {
 		records = new Vector<String>();
 		client = new Client(this);
@@ -46,13 +66,20 @@ public class TestServicePublish implements IClientCallback, IEntryGroupCallback{
 		System.out.println("state: "+client.getState());
 	}
 	
-	public void addService() throws Exception{
+	/**
+	 * This method creates the {@link EntryGroup}, adds some TXT records, a name,
+	 * a service type and port number. It then proceeds to publish the service.
+	 * If there is a name conflict, it asks Avahi4J for an alternate name and 
+	 * tries again.
+	 * @throws Avahi4JException if there is an error creating the {@link EntryGroup}
+	 */
+	public void addService() throws Avahi4JException {
 		int result;
 
 		// create group
 		group = client.createEntryGroup(this);
 		
-		// ad fake TXT records
+		// create some fake TXT records
 		records.add("record1=1");
 		records.add("record2=2");
 		
@@ -83,24 +110,31 @@ public class TestServicePublish implements IClientCallback, IEntryGroupCallback{
 		
 	}
 	
+	/**
+	 * This method updates the TXT records of the previously created service
+	 */
 	public void updateService() throws Exception{
 		int result;
 		// TXT records
 		Vector<String> records = new Vector<String>();
 		
 		// update records
-		records.remove("record1=1");
+		records.add("record1=1");
 		records.add("UpdatedRecord2=NewUpdatedValue2");
 		System.out.println("\n\nUpdating service");
 		result = group.updateService(Avahi4JConstants.AnyInterface, Protocol.ANY,
 				"TestService", "_test._tcp", null, records);
 		if(result!=Avahi4JConstants.AVAHI_OK){
-			System.out.println("Error updating service: "+ Avahi4JConstants.getErrorString(result));
+			System.out.println("Error updating service: "
+					+ Avahi4JConstants.getErrorString(result));
 		} else {
 			System.out.println("done");
 		}
 	}
 	
+	/**
+	 * This method resets (un-publishes) the service
+	 */
 	public void resetService(){
 		int result;
 		
@@ -115,23 +149,38 @@ public class TestServicePublish implements IClientCallback, IEntryGroupCallback{
 		}
 	}
 	
+	/**
+	 * This method releases the {@link EntryGroup} and {@link Client}
+	 */
 	public void stop(){
 		group.release();
 		client.stop();
 		client.release();
 	}
 
+	/**
+	 * This callback method is invoked whenever the Avahi4J {@link Client}'s 
+	 * state changes. See {@link State} for a list of possible client states.
+	 */
 	@Override
 	public void clientStateChanged(Client.State state) {
 		System.out.println("client's new state: " + state);
 	}
 	
+	/**
+	 * This callback method is invoked whenever the {@link EntryGroup}'s 
+	 * state changes. See {@link State} for a list of possible states.
+	 */
 	@Override
 	public void groupStateChanged(State newState) {
 		System.out.println("Group's new state: " + newState);
 	}
 
-	
+	/**
+	 * Main method which publishes a service, updates it & release it
+	 * @param args (does not expect any argument)
+	 * @throws Exception If there is an error of some sort
+	 */
 	public static void main(String args[]) throws Exception{
 		TestServicePublish t = new TestServicePublish();
 		System.out.println("Press <Enter>");

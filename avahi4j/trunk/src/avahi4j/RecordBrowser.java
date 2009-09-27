@@ -21,7 +21,18 @@ import avahi4j.Avahi4JConstants.BrowserEvent;
 import avahi4j.Avahi4JConstants.DNS_Class;
 import avahi4j.Avahi4JConstants.DNS_RRType;
 import avahi4j.Avahi4JConstants.Protocol;
+import avahi4j.exceptions.Avahi4JException;
 
+/**
+ * Objects of this class are used to browse DNS records for a specific host.
+ * To create a record browser object for a given host, call 
+ * {@link Client#createRecordBrowser(IRecordBrowserCallback, int, avahi4j.Avahi4JConstants.Protocol, String, avahi4j.Avahi4JConstants.DNS_Class, avahi4j.Avahi4JConstants.DNS_RRType, int) createRecordBrowser()}
+ * on an existing {@link Client} object. Once the specified records are retrieved, results
+ * will be delivered to the provided callback object. <b>Record browser objects 
+ * MUST be released when no longer needed, by calling {@link #release()}.</b> 
+ * @author gilles
+ *
+ */
 public final class RecordBrowser {
 	
 	/*
@@ -35,8 +46,14 @@ public final class RecordBrowser {
 	/*
 	 * N A T I V E   M E T H O D S
 	 */
+	/**
+	 * This method create an avahi record browser object
+	 * @return a JNI pointer to a avahi4j_record_browser struct
+	 * @throws Avahi4JException if there is an error creating the record browser
+	 */
 	private native long initBrowser(long avahi4j_client_ptr,  int interfaceIdx,
-			int proto, String name, int clazz, int type, int lookupFlag);
+			int proto, String name, int clazz, int type, int lookupFlag) 
+			throws Avahi4JException;
 	
 	private native int releaseBrowser(long avahi4j_record_browser_ptr);
 	
@@ -44,9 +61,12 @@ public final class RecordBrowser {
 	/*
 	 * M E T H O D S
 	 */
+	/**
+	 * This method creates a new record browser
+	 */
 	RecordBrowser(long avahi4j_client_ptr, IRecordBrowserCallback cb, 
 			int interfaceIdx, Protocol proto, String name, DNS_Class clazz, 
-			DNS_RRType type, int lookupFlag){
+			DNS_RRType type, int lookupFlag) throws Avahi4JException{
 		
 		released = false;
 		callback = cb;
@@ -54,6 +74,9 @@ public final class RecordBrowser {
 				proto.ordinal(), name, clazz.ordinal(), type.ordinal(), lookupFlag);
 	}
 	
+	/**
+	 * This method releases this record browser object.
+	 */
 	public synchronized void release() {
 		if(!released){
 			releaseBrowser(avahi4j_record_browser_ptr);

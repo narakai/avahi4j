@@ -18,7 +18,7 @@
 package avahi4j.exceptions;
 
 /**
- * This class represents a generic SimpleMDNS exception.
+ * This class represents a generic Avahi4J exception.
  * @author gilles
  *
  */

@@ -20,7 +20,27 @@ package avahi4j;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.Avahi4JConstants.BrowserEvent;
 
+/**
+ * Objects implementing this interface can receive notifications from a 
+ * {@link ServiceBrowser} about services matching a set of criteria (given to the
+ * service browser when instantiated).
+ * @author gilles
+ *
+ */
 public interface IServiceBrowserCallback {
+	/**
+	 * This method is called by a {@link ServiceBrowser} when an event about a service 
+	 * matching the criteria given to the service browser has been reported. 
+	 * The details about this event are given as arguments to this method.
+	 * @param interfaceNum the interface number the matching service is registered on
+	 * @param proto the protocol of the matching service
+	 * @param browserEvent the event that triggered this call
+	 * @param name the name of the service
+	 * @param type the type of the service
+	 * @param domain the domain of the service
+	 * @param lookupResultFlag lookup result flags 
+	 * (See Avahi4JConstants.LOOKUP_RESULT_* )
+	 */
 	public void serviceCallback(int interfaceNum, Protocol proto, BrowserEvent browserEvent,
 			String name, String type, String domain, int lookupResultFlag);
 }

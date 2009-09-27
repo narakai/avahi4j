@@ -46,9 +46,8 @@
 		<echo message=" uninstall-doc:     Uninstall JavaDoc (must be root)"/>
 		<echo message=" clean:             Remove all build generated files"/>
 		<echo message=" ********************************************************" />
-		<echo message=" test-publish:          Runs a service publishing test application"/>
-		<echo message=" test-srv-browser:      Runs a service browser test application"/>
-		<echo message=" test-record-browser:   Runs a record browser test application"/>
+		<echo message=" test-publish:      Runs a service publishing test application"/>
+		<echo message=" test-browse:       Runs a service browser test application"/>
 		<echo message="" />
 		<echo message=""/>
 		<echo message=""/>
@@ -170,7 +169,6 @@
 	
 	<target name="javadoc">
 		<javadoc sourcepath="${project.src}" packagenames="avahi4j.*" destdir="${project.javadoc.dir}" public="true" use="true">
-			<excludepackage name="avahi4j.examples" />
 		</javadoc>
 	</target>
 	
@@ -183,7 +181,7 @@
 		</java>
 	</target>
 	
-	<target name="test-srv-browser" depends="jar,jnilib">
+	<target name="test-browse" depends="jar,jnilib">
 		<java classname="${project.example.servicebrowser}" fork="true" failonerror="true">
 			<classpath>
 				<pathelement location="${project.jar.file}"/>
@@ -191,16 +189,7 @@
 			<jvmarg value="-Djava.library.path=."/>
 		</java>
 	</target>
-	
-	<target name="test-record-browser" depends="jar,jnilib">
-		<java classname="${project.example.recordbrowser}" fork="true" failonerror="true">
-			<classpath>
-				<pathelement location="${project.jar.file}"/>
-			</classpath>
-			<jvmarg value="-Djava.library.path=."/>
-		</java>
-	</target>
-	
+		
 	<target name="clean">
 		<exec executable="make">
 			<arg line="-C ${project.src} clean" />

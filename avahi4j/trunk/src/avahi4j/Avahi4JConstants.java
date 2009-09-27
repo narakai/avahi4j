@@ -17,69 +17,184 @@
 */
 package avahi4j;
 
+/**
+ * This class contains a number of constants and enumerations used throughout
+ * Avahi4J.
+ * @author gilles
+ *
+ */
 public class Avahi4JConstants {
 
+	/**
+	 * This enumeration contains a list of possible browser events (either from
+	 * {@link ServiceBrowser} or {@link RecordBrowser}). The event applies to 
+	 * a matching item: either a service (for {@link ServiceBrowser}s) or a record
+	 * (for {@link RecordBrowser}s).
+	 * @author gilles
+	 */
 	public enum BrowserEvent {
+		/**
+		 * A new item has been discovered
+		 */
 		NEW,
+		/**
+		 * An existing item has been removed
+		 */
 		REMOVE,
+		/**
+		 * All the cached entries have been reported
+		 */
 		CACHE_EXHAUSTED,
+		/**
+		 * There are no more items
+		 */
 		NO_MORE,
+		/**
+		 * There was an error browsing for items
+		 */
 		FAILURE
 	}
 	
+	/**
+	 * This enumeration contains a list of possible DNS classes
+	 * @author gilles
+	 *
+	 */
 	public enum DNS_Class {
+		/**
+		 * The Internet DNS class
+		 */
 		AVAHI_DNS_CLASS_IN
 	}
 	
+	/**
+	 * This enumeration contains a list of possible DNS Resource Record types.
+	 * See http://en.wikipedia.org/wiki/List_of_DNS_record_types for 
+	 * more information. 
+	 * @author gilles
+	 */
 	public enum DNS_RRType{
+		/**
+		 * The A RR (IPv4 address)
+		 */
 		A,
+		/**
+		 * The NS RR (name server)
+		 */
 		NS,
+		/**
+		 * The CNAME RR  (alias)
+		 */
 		CNAME,
+		/**
+		 * The SOA RR (Start Of Authority)
+		 */
 		SOA,
+		/**
+		 * The PTR RR (IPv4 to hostname matching)
+		 */
 		PTR,
+		/**
+		 * The HINFO RR (host information)
+		 */
 		HINFO ,
+		/**
+		 * The MX RR (Mail eXchange)
+		 */
 		MX,
+		/**
+		 * The TXT RR (text information)
+		 */
 		TXT,
+		/**
+		 * The AAAA RR (IPv6 address)
+		 */
 		AAAA,
+		/**
+		 * The SRV RR (available service)
+		 */
 		SRV
 	}
 	
+	/**
+	 * Lookup flag: When doing service resolving, don't lookup TXT record. 
+	 */
 	public final static int LOOKUP_NO_TXT = 1;
+	/**
+	 * Lookup flag: When doing service resolving, don't lookup A/AAAA record. 
+	 */
 	public final static int LOOKUP_NO_ADDRESS = 1 << 1;
 	public final static int LOOKUP_FLAGS_MAX = (1 << 2) -1 ;
 
 	/**
-	 * 
+	 * Lookup result flag: 	This response originates from the cache.
 	 */
 	public final static int LOOKUP_RESULT_CACHED = 1;
+	/**
+	 * Lookup result flag: This response originates from wide area DNS.
+	 */
 	public final static int LOOKUP_RESULT_WIDE_AREA = 1 << 1;
+	/**
+	 * Lookup result flag: This response originates from multicast DNS.
+	 */
 	public final static int LOOKUP_RESULT_MULTICAST = 1 << 2;
+	/**
+	 * Lookup result flag: This record/service resides on and was announced by 
+	 * the local host. Only present with {@link BrowserEvent#NEW}.
+	 */
 	public final static int LOOKUP_RESULT_LOCAL = 1 << 3;
+	/**
+	 * Lookup result flag: This service belongs to the same local client as the 
+	 * browser object. Only present with {@link BrowserEvent#NEW}.
+	 */
 	public final static int LOOKUP_RESULT_OUR_OWN = 1 << 4;
+	/**
+	 * Lookup resul flag: The returned data has been defined statically by some 
+	 * configuration option. 
+	 */
 	public final static int LOOKUP_RESULT_STATIC = 1 << 5;
 	public final static int LOOKUP_RESULT_FLAGS_MAX = (1 << 6)-1;
 	
-	public final static String lookupResultToString(int result){
+	/**
+	 * This method returns a readable version of the given lookup result flags.
+	 * @param flags the lookup result flags to be string'ified.
+	 * @return a string version of the given flags
+	 */
+	public final static String lookupResultToString(int flags){
 		String s="";
-		if ((result & LOOKUP_RESULT_CACHED)!=0)
+		if ((flags & LOOKUP_RESULT_CACHED)!=0)
 			s += "'Cached' ";
-		if ((result & LOOKUP_RESULT_WIDE_AREA)!=0)
+		if ((flags & LOOKUP_RESULT_WIDE_AREA)!=0)
 			s += "'Wide-area DNS' ";
-		if ((result & LOOKUP_RESULT_MULTICAST)!=0)
+		if ((flags & LOOKUP_RESULT_MULTICAST)!=0)
 			s += "'Multicast DNS' ";
-		if ((result & LOOKUP_RESULT_LOCAL)!=0)
+		if ((flags & LOOKUP_RESULT_LOCAL)!=0)
 			s += "'Local' ";
-		if ((result & LOOKUP_RESULT_OUR_OWN)!=0)
+		if ((flags & LOOKUP_RESULT_OUR_OWN)!=0)
 			s += "'Our own' ";
-		if ((result & LOOKUP_RESULT_STATIC)!=0)
+		if ((flags & LOOKUP_RESULT_STATIC)!=0)
 			s += "'Static' ";
 		
 		return s.trim();
 	}
 	
+	/**
+	 * This enumeration lists supported procotols. 
+	 * @author gilles
+	 *
+	 */
 	public enum Protocol {
+		/**
+		 * IPv4
+		 */
 		INET,
+		/**
+		 * IPv6
+		 */
 		INET6,
+		/**
+		 * Any IP version (4 or 6)
+		 */
 		ANY
 	}
 	

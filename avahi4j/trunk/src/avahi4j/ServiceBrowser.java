@@ -21,22 +21,21 @@ import avahi4j.Avahi4JConstants.BrowserEvent;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
-
+/**
+ * A service browser object can be used to look for services matching a given set
+ * of criteria. To create service browser object, call
+ * {@link Client#createServiceBrowser(IServiceBrowserCallback, int, avahi4j.Avahi4JConstants.Protocol, String, String, int) createServiceBrowser()}
+ * on an existing {@link Client}. When a matching service is found, its details
+ * will be provided to the {@link IServiceBrowserCallback} object.
+ * @author gilles
+ *
+ */
 public final class ServiceBrowser {
 	/*
 	 * M E M B E R S
 	 */
-	/**
-	 * A JNI pointer to a struct avahi4j_service_browser
-	 */
 	private long avahi4j_service_browser_ptr;
-	/**
-	 * the group's callback object (cannot be null)
-	 */
 	private IServiceBrowserCallback browserCallback;
-	/**
-	 * flag indicating whether released() has been called already
-	 */
 	private boolean released;
 	
 	

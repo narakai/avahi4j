@@ -20,7 +20,31 @@ package avahi4j;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.ServiceResolver.ServiceResolverEvent;
 
+/**
+ * Classes implementing this interface receive notifications from {@link ServiceResolver}
+ * objects when a service (as registered with the service resovler object) has 
+ * been resolved. 
+ * @author gilles
+ *
+ */
 public interface IServiceResolverCallback {
+	/**
+	 * This method is called when a service has been resolved. The service details
+	 * are given as arguments.
+	 * @param resolver the {@link ServiceResolver} object who 's callling this method
+	 * @param interfaceNum the interface number the service is registered on
+	 * @param proto the service's protocol
+	 * @param resolverEvent the event associated with the service
+	 * @param name the name of the service
+	 * @param type the type of the service
+	 * @param domain the domain where the service is registered
+	 * @param hostname the name of the host offering this service
+	 * @param address the address of the host
+	 * @param port the port the service is running on
+	 * @param txtRecords any TXT records associated with the service
+	 * @param lookupResultFlag the lookup result flag LOOKUP_RESULT_* 
+	 * (See {@link Avahi4JConstants})
+	 */
 	public void resolverCallback(ServiceResolver resolver, int interfaceNum,
 			Protocol proto,	ServiceResolverEvent resolverEvent,	String name,
 			String type, String domain, String hostname, Address address, 

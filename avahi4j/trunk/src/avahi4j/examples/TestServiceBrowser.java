@@ -18,6 +18,8 @@
 package avahi4j.examples;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import avahi4j.Address;
 import avahi4j.Avahi4JConstants;
@@ -33,31 +35,94 @@ import avahi4j.Client.State;
 import avahi4j.ServiceResolver.ServiceResolverEvent;
 import avahi4j.exceptions.Avahi4JException;
 
-public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallback, IServiceResolverCallback {
+/**
+ * This example class demonstrates how to look for a specific type of service,
+ * and how to resolve it, ie find the IP address where this service is available.
+ * This class also shows how to keep informed of service updates.
+ * @author gilles
+ *
+ */
+public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallback,
+		IServiceResolverCallback {
+	
+	/**
+	 * The Avahi4J {@link Client} object
+	 */
 	private Client client;
+	
+	/**
+	 * A {@link ServiceBrowser} object used to look for "_test._tcp" services
+	 */
 	private ServiceBrowser browser;
 	
+	/**
+	 * Each matching service is resolved by a {@link ServiceResolver} object,
+	 * which is kept open and a reference is stored in this list, so it can be
+	 * released upon exit
+	 */
+	private List<ServiceResolver> resolvers;
+	
+	/**
+	 * This method builds the test object
+	 * @throws Avahi4JException if there is an error creating or starting
+	 * the {@link Client} object.
+	 */
 	public TestServiceBrowser() throws Avahi4JException {
+		resolvers = new ArrayList<ServiceResolver>();
 		client = new Client(this);
 		client.start();
 	}
 	
+	/** This method looks for "_test._tcp" services.  Matching services are
+	 * delivered to the callback method 
+	 * {@link #serviceCallback(int, avahi4j.Avahi4JConstants.Protocol, avahi4j.Avahi4JConstants.BrowserEvent, String, String, String, int) serviceCallback()},
+	 * which then resolves the services.  
+	 * @throws Avahi4JException if there is an error creating the 
+	 * {@link ServiceBrowser} object
+	 */
 	public void browse() throws Avahi4JException {
+		// browse for "_test._tcp" services
 		browser = client.createServiceBrowser(this, Avahi4JConstants.AnyInterface,
 				Protocol.ANY , "_test._tcp", null, 0);
 	}
 	
+	/**
+	 * This method releases the {@link ServiceBrowser} object created in 
+	 * {@link #browse()}. After that, items in the {@link ServiceResolver} list
+	 * are freed,  the client stopped and released.
+	 */
 	public void stop() {
+		// release the browser first so no more ServiceResolver can be added
+		// to the list
 		browser.release();
+		
+		// we can now safely release items in the list
+		for(ServiceResolver s: resolvers)
+			s.release();
+		
+		// stop and release the client
 		client.stop();
 		client.release();
 	}
 
+	/**
+	 * This callback method is invoked whenever the Avahi4J {@link Client}'s 
+	 * state changes. See {@link State} for a list of possible client states.
+	 */
 	@Override
 	public void clientStateChanged(State state) {
 		System.out.println("Client state changed to "+state);
 	}
 
+	/**
+	 * This callback method is invoked whenever a new matching service is 
+	 * discovered. This method prints the service details, and creates a 
+	 * {@link ServiceResolver} object to resolve the IP address of the computer
+	 * offering the service. The {@link ServiceResolver} is kept open so changes
+	 * in the service's records are received. A reference to the 
+	 * {@link ServiceResolver} is also stored in {@link #resolvers} so it can be
+	 * released upon exit.  
+	 */
 	@Override
 	public void serviceCallback(int interfaceNum, Protocol proto,
 			BrowserEvent browserEvent, String name, String type,
@@ -75,14 +140,14 @@ public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallb
 					+ Avahi4JConstants.lookupResultToString(lookupResultFlag)
 					+ "\n");
 			
-			// only if it's a new service, resolve the hostname and print
-			// TXT records
+			// only if it's a new service, resolve it
 			if(browserEvent==BrowserEvent.NEW){
 				try {
-					// we discard the returned reference to the resolver
-					// it will be freed when the callback is received 
-					client.createServiceResolver(this, interfaceNum, proto, name, type, 
-							domain, Protocol.ANY, 0);
+					// ServiceResolvers are kept open and a reference is stored
+					// in a list so they can be freed upon exit
+					resolvers.add(client.createServiceResolver(this, 
+							interfaceNum, proto, name, type, domain, 
+							Protocol.ANY, 0));
 				} catch (Avahi4JException e) {
 					System.out.println("error creating resolver");
 					e.printStackTrace();
@@ -91,6 +156,10 @@ public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallb
 		}
 	}
 
+	/**
+	 * This callback method is invoked when a service is resolved. It prints the
+	 * service's hostname and TXT records
+	 */
 	@Override
 	public void resolverCallback(ServiceResolver resolver, int interfaceNum, 
 			Protocol proto,	ServiceResolverEvent resolverEvent, String name, 
@@ -110,9 +179,6 @@ public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallb
 		} else {
 			System.out.println("Unable to resolve name");
 		}
-		
-		// release 
-		resolver.release();
 	}
 
 	public static void main(String args[]) throws Avahi4JException, IOException{

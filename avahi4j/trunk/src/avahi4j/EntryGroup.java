@@ -280,10 +280,17 @@ public class EntryGroup {
 				txtRecord.toArray(new String[0]), numRecords);
 	}
 	
+	public void test(int i){
+		
+	}
+	public void test2(Protocol p){
+		
+	}
+	
 	/**
 	 * This method adds a subtype to an existing service in this group. The service
 	 * identified by interfaceNum, proto, name, type and domain must have been
-	 * added (using {@link #addService(int, Protocol, String, String, String, String, short, List)})
+	 * added (using {@link #addService(int, avahi4j.Avahi4JConstants.Protocol, String, String, String, String, int, List) addService()} )
 	 * to this group prior to calling this method.
 	 * @param interfaceNum the interface this service shall be announced on
 	 * @param proto the protocol this service shall be announced with
@@ -313,7 +320,7 @@ public class EntryGroup {
 	 * This method updates an existing service's list of TXT records string 
 	 * to this group. The service identified by interfaceNum, proto, name, type 
 	 * and domain must have been added 
-	 * (using {@link #addService(int, Protocol, String, String, String, String, short, List)})
+	 * (using {@link #addService(int, avahi4j.Avahi4JConstants.Protocol, String, String, String, String, int, List) addService()})
 	 * to this group prior to calling this method. Records are updated immediately,
 	 * do not call {@link #commit()}.
 	 * @param interfaceNum the interface this service shall be announced on

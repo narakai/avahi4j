@@ -19,6 +19,11 @@ package avahi4j;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.JNIException;
 
+/**
+ * This class encapsulate an IP address, either IPv4 or IPv6.
+ * @author gilles
+ *
+ */
 public class Address {
 	private String address;
 	private Protocol protocol;
@@ -35,7 +40,7 @@ public class Address {
 		protocol = Protocol.values()[parse_avahi_address(avahi_address_ptr)];
 	}
 
-	public Address(String a, Protocol p){
+	Address(String a, Protocol p){
 		if(a==null)
 			throw new NullPointerException("The address can not be null");
 		if(p.equals(Protocol.ANY))
@@ -45,9 +50,18 @@ public class Address {
 		protocol = p;
 	}
 	
+	/**
+	 * This method returns the IP address as a string.
+	 * @return the IP address contained in this object, as a string.
+	 */
 	public String getAddress() {
 		return address;
 	}
+	
+	/**
+	 * This method returns the type of this IP address (IPv4 or IPv6).
+	 * @return the type of this IP address
+	 */
 	public Protocol getProtocol() {
 		return protocol;
 	}

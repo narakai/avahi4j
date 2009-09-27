@@ -19,6 +19,17 @@ package avahi4j;
 
 import avahi4j.EntryGroup.State;
 
+
+/**
+ * Classes implementing this interface are notified when the state of an 
+ * {@link EntryGroup} changes. 
+ * @author gilles
+ *
+ */
 public interface IEntryGroupCallback {
+	/**
+	 * This method is called when the state of an entry group changes.
+	 * @param newState the new state
+	 */
 	public void groupStateChanged(State newState);
 }
