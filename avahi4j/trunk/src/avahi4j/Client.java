@@ -405,4 +405,27 @@ public class Client {
 		if(clientCallback!=null)
 			clientCallback.clientStateChanged(Client.State.values()[newState]);
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (int) (avahi4j_client_ptr ^ (avahi4j_client_ptr >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Client))
+			return false;
+		Client other = (Client) obj;
+		if (avahi4j_client_ptr != other.avahi4j_client_ptr)
+			return false;
+		return true;
+	}
+	
+	
 }

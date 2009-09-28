@@ -96,4 +96,27 @@ public final class RecordBrowser {
 				DNS_RRType.values()[type], rdata, flags);
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ (int) (avahi4j_record_browser_ptr ^ (avahi4j_record_browser_ptr >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof RecordBrowser))
+			return false;
+		RecordBrowser other = (RecordBrowser) obj;
+		if (avahi4j_record_browser_ptr != other.avahi4j_record_browser_ptr)
+			return false;
+		return true;
+	}
 }

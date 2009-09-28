@@ -30,11 +30,15 @@ import avahi4j.ServiceResolver.ServiceResolverEvent;
 public interface IServiceResolverCallback {
 	/**
 	 * This method is called when a service has been resolved. The service details
-	 * are given as arguments.
-	 * @param resolver the {@link ServiceResolver} object who 's callling this method
+	 * are given as arguments. <b>Note that when a service is removed, the reported
+	 * event is set to {@link ServiceResolverEvent#RESOLVER_FOUND}, but the other
+	 * arguments are set to 0 and null.</b> So take care when handling these arguments.
+	 * @param resolver the {@link ServiceResolver} object who 's calling this method
 	 * @param interfaceNum the interface number the service is registered on
 	 * @param proto the service's protocol
-	 * @param resolverEvent the event associated with the service
+	 * @param resolverEvent the event associated with the service. If 
+	 * {@link ServiceResolverEvent#RESOLVER_FAILURE} is received, all the other 
+	 * fields are meaningless. 
 	 * @param name the name of the service
 	 * @param type the type of the service
 	 * @param domain the domain where the service is registered

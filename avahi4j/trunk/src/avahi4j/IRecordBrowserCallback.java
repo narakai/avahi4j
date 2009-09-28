@@ -35,7 +35,8 @@ public interface IRecordBrowserCallback {
 	 * @param browser the {@link RecordBrowser} object calling this method.
 	 * @param interfaceNum the interface number the host is registered on
 	 * @param proto the protocol
-	 * @param event the event associated with this record
+	 * @param event the event associated with this record. If {@link BrowserEvent#FAILURE}
+	 * is received, all the other fields are meaningless.
 	 * @param name the hostname
 	 * @param clazz the RR class
 	 * @param type the RR type

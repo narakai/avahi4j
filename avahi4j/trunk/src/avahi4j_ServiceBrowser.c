@@ -33,13 +33,25 @@ static void browser_callback(AvahiServiceBrowser *b, AvahiIfIndex if_idx,
 
 	// attach the jvm to this thread
 	(*browser->jvm)->AttachCurrentThread(browser->jvm, (void **)&e, NULL);
-	jname = (*e)->NewStringUTF(e, name);
-	jtype = (*e)->NewStringUTF(e, type);
-	jdomain = (*e)->NewStringUTF(e, domain);
-	GET_JAVA_PROTO(protocol, jproto);
-	GET_JAVA_IF_IDX(if_idx,jif_idx);
-	GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
+
+	// check event
 	GET_JAVA_BROWSER_EVT(event, jevent);
+	if(event==AVAHI_BROWSER_FAILURE){
+		jname=NULL;
+		jtype=NULL;
+		jdomain=NULL;
+		jproto=0;
+		jif_idx=0;
+		jflags=0;
+	} else {
+		jname = (*e)->NewStringUTF(e, name);
+		jtype = (*e)->NewStringUTF(e, type);
+		jdomain = (*e)->NewStringUTF(e, domain);
+		GET_JAVA_PROTO(protocol, jproto);
+		GET_JAVA_IF_IDX(if_idx,jif_idx);
+		GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
+		GET_JAVA_BROWSER_EVT(event, jevent);
+	}
 
 	// call the callback dispatch method
 	(*e)->CallVoidMethod(e, browser->browserObject,

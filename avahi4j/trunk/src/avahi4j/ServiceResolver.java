@@ -138,9 +138,36 @@ public final class ServiceResolver {
 			String name, String type, String domain, String hostname, 
 			String address, int addressType, int port, String txtRecords[], int lookupResultFlag){
 		
+		Address a;
+		try {
+			a = new Address(address, Protocol.values()[addressType]);
+		} catch (Exception e) {a = null;}
+
 		resolverCallback.resolverCallback(this, interfaceNum, Protocol.values()[proto],
-				ServiceResolverEvent.values()[resolverEvent], name, type, domain,
-				hostname, new Address(address, Protocol.values()[addressType]) ,
-				port, txtRecords, lookupResultFlag);
+			ServiceResolverEvent.values()[resolverEvent], name, type, domain,
+			hostname, a, port, txtRecords, lookupResultFlag);
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (int) (avahi4j_resolver_ptr ^ (avahi4j_resolver_ptr >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ServiceResolver))
+			return false;
+		ServiceResolver other = (ServiceResolver) obj;
+		if (avahi4j_resolver_ptr != other.avahi4j_resolver_ptr)
+			return false;
+		return true;
 	}
 }

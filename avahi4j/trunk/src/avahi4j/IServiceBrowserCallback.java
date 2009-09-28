@@ -34,7 +34,9 @@ public interface IServiceBrowserCallback {
 	 * The details about this event are given as arguments to this method.
 	 * @param interfaceNum the interface number the matching service is registered on
 	 * @param proto the protocol of the matching service
-	 * @param browserEvent the event that triggered this call
+	 * @param browserEvent the event that triggered this call. If 
+	 * {@link BrowserEvent#FAILURE} is received, all the other values are 
+	 * meaningless
 	 * @param name the name of the service
 	 * @param type the type of the service
 	 * @param domain the domain of the service

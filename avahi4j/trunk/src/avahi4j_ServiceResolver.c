@@ -31,58 +31,76 @@ static void resolver_callback(AvahiServiceResolver *r, AvahiIfIndex interface,
 
 	dprint("[LOG] Entering %s\n", __PRETTY_FUNCTION__);
 	char address_str[AVAHI_ADDRESS_STR_MAX];
-	jstring jname, jtype, jdomain, jhost, jaddress, jcurrent_txt;
+	jstring jname=NULL, jtype=NULL, jdomain=NULL, jhost=NULL, jaddress=NULL, jcurrent_txt=NULL;
 	jobjectArray txt_list=NULL;
-	jint jif_idx, jproto, jevent, jflags, jaddress_proto;
+	jint jif_idx=0, jproto=0, jevent=0, jflags=0, jaddress_proto=0;
 	int index, num_txt_records=avahi_string_list_length(txt);
 
 	struct avahi4j_service_resolver *resolver = (struct avahi4j_service_resolver *) userdata;
 	JNIEnv *e;
 
-	// translate if, protocol, event and address type
-	GET_JAVA_IF_IDX(interface, jif_idx);
-	GET_JAVA_PROTO(protocol, jproto);
-	GET_JAVA_RESOLVER_EVT(event, jevent);
-	GET_JAVA_PROTO(address->proto, jaddress_proto);
-
-	// translate lookup result flags
-	GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
+	dprint("[LOG] Entering1 %s\n", __PRETTY_FUNCTION__);
 
 	// attach the jvm to this thread
 	(*resolver->jvm)->AttachCurrentThread(resolver->jvm, (void **)&e, NULL);
 
-	// get java strings
-	GET_JSTRING_JUMP(name,jname,e, bail);
-	GET_JSTRING_JUMP(type,jtype,e, bail);
-	GET_JSTRING_JUMP(domain,jdomain,e, bail);
-	GET_JSTRING_JUMP(host_name,jhost,e, bail);
-	avahi_address_snprint(address_str, AVAHI_ADDRESS_STR_MAX, address);
-	GET_JSTRING_JUMP(address_str, jaddress,e, bail);
+	// check event
+	GET_JAVA_RESOLVER_EVT(event, jevent);
+	if(event==AVAHI_RESOLVER_FAILURE) {
+		jname=NULL;
+		jtype=NULL;
+		jdomain=NULL;
+		jhost=NULL;
+		jaddress=NULL;
+		jcurrent_txt=NULL;
+		txt_list=NULL;
+		jif_idx=0;
+		jproto=0;
+		jevent=0;
+		jflags=0;
+		jaddress_proto=0;
+		num_txt_records=0;
+	} else {
+		// translate if, protocol, event and address type
+		GET_JAVA_IF_IDX(interface, jif_idx);
+		GET_JAVA_PROTO(protocol, jproto);
+		GET_JAVA_RESOLVER_EVT(event, jevent);
+		GET_JAVA_PROTO(address->proto, jaddress_proto);
 
+		// translate lookup result flags
+		GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
 
-	// build txt record array
-	txt_list = (*e)->NewObjectArray(e, num_txt_records, resolver->stringClass, NULL);
-	if(txt_list==NULL){
-		dprint("Error creating txt list\n");
-		goto bail;
-	}
+		// get java strings
+		GET_JSTRING_JUMP(name,jname,e, bail);
+		GET_JSTRING_JUMP(type,jtype,e, bail);
+		GET_JSTRING_JUMP(domain,jdomain,e, bail);
+		GET_JSTRING_JUMP(host_name,jhost,e, bail);
+		avahi_address_snprint(address_str, AVAHI_ADDRESS_STR_MAX, address);
+		GET_JSTRING_JUMP(address_str, jaddress,e, bail);
 
-	for(index=0; index<num_txt_records;index++){
-		jcurrent_txt = (*e)->NewStringUTF(e, (char *)avahi_string_list_get_text(txt));
-
-		if(jcurrent_txt!=NULL){
-			dprint("Adding txt record '%s' to array\n",avahi_string_list_get_text(txt));
-			// add txt record to array
-			(*e)->SetObjectArrayElement(e, txt_list, index, jcurrent_txt);
-		} else {
-			dprint("Error creating jstring form txt record %s\n",
-					avahi_string_list_get_text(txt));
+		// build txt record array
+		txt_list = (*e)->NewObjectArray(e, num_txt_records, resolver->stringClass, NULL);
+		if(txt_list==NULL){
+			dprint("Error creating txt list\n");
+			goto bail;
 		}
 
-		// move on to next one
-		txt = avahi_string_list_get_next(txt);
-	}
+		for(index=0; index<num_txt_records;index++){
+			jcurrent_txt = (*e)->NewStringUTF(e, (char *)avahi_string_list_get_text(txt));
 
+			if(jcurrent_txt!=NULL){
+				dprint("Adding txt record '%s' to array\n",avahi_string_list_get_text(txt));
+				// add txt record to array
+				(*e)->SetObjectArrayElement(e, txt_list, index, jcurrent_txt);
+			} else {
+				dprint("Error creating jstring form txt record %s\n",
+						avahi_string_list_get_text(txt));
+			}
+
+			// move on to next one
+			txt = avahi_string_list_get_next(txt);
+		}
+	}
 
 	// call the callback dispatch method
 	(*e)->CallVoidMethod(e, resolver->resolverObject,
@@ -90,10 +108,10 @@ static void resolver_callback(AvahiServiceResolver *r, AvahiIfIndex interface,
 			jname, jtype, jdomain, jhost, jaddress, jaddress_proto, port,
 			txt_list, jflags);
 
+bail:
 	// detach the jvm
 	(*resolver->jvm)->DetachCurrentThread(resolver->jvm);
 
-bail:
 	return;
 }
 

@@ -36,35 +36,42 @@ static void browser_callback(AvahiRecordBrowser *b, AvahiIfIndex interface,
 	jbyteArray array;
 	int i;
 
-	// translate ints
-	GET_JAVA_IF_IDX(interface, jif_idx);
-	GET_JAVA_PROTO(protocol, jproto);
-	GET_JAVA_BROWSER_EVT(event,  jevent);
-	A2J_DNS_CLASS(clazz, jclazz);
-	A2J_DNS_RR_TYPE(type, jtype);
-	GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
-
-	dprint("data size: %d\n", size);
-	for(i=0;i<size;i++){
-		printf("%c", ((uint8_t *)rdata)[i]);
-	}
-	dprint("\n");
-
 	// attach the jvm to this thread
 	(*browser->jvm)->AttachCurrentThread(browser->jvm, (void **)&e, NULL);
 
-	// create jstring from name
-	GET_JSTRING_JUMP(name, jname, e, bail);
+	// check event
+	GET_JAVA_BROWSER_EVT(event,  jevent);
+	if(event==AVAHI_BROWSER_FAILURE){
+		jif_idx=0;
+		jproto=0;
+		jevent=0;
+		jclazz=0;
+		jtype=0;
+		jflags=0;
+		jname=NULL;
+		array=NULL;
+	} else {
+		// translate ints
+		GET_JAVA_IF_IDX(interface, jif_idx);
+		GET_JAVA_PROTO(protocol, jproto);
+		GET_JAVA_BROWSER_EVT(event,  jevent);
+		A2J_DNS_CLASS(clazz, jclazz);
+		A2J_DNS_RR_TYPE(type, jtype);
+		GET_JAVA_LOOKUP_RES_FLAG(flags, jflags);
 
-	// create byte array
-	array = (*e)->NewByteArray(e, size);
-	if(array==NULL) {
-		dprint("Unable to create a byte array\n");
-		goto bail;
+		// create jstring from name
+		GET_JSTRING_JUMP(name, jname, e, bail);
+
+		// create byte array
+		array = (*e)->NewByteArray(e, size);
+		if(array==NULL) {
+			dprint("Unable to create a byte array\n");
+			goto bail;
+		}
+
+		// copy bytes
+		(*e)->SetByteArrayRegion(e, array, 0, size, rdata);
 	}
-
-	// copy bytes
-	(*e)->SetByteArrayRegion(e, array, 0, size, rdata);
 
 	// call callback dispatch method
 	(*e)->CallVoidMethod(e, browser->browserObject, browser->browserCallbackDispatch,

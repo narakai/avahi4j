@@ -168,14 +168,23 @@ public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallb
 
 		// print resolved name details
 		if(resolverEvent==ServiceResolverEvent.RESOLVER_FOUND) {
-			System.out.println(" ******  Service RESOLVED:\nInterface: "
-					+ interfaceNum + "\nProtocol :"	+ proto + "\nName: " + name 
-					+ "\nType: " + type+ "\nHostname: "+ hostname +"\nDomain: "
-					+ domain+ "\nAddress: " + address + "\nFlags: " 
-					+ Avahi4JConstants.lookupResultToString(lookupResultFlag)
-					+ "\nTXT records:");
-			for(String s: txtRecords)
-				System.out.println(s);
+			
+			if(name==null && type==null && hostname==null) {
+				// if null, the service has disappeared, release the resolver
+				// and remove it from the list
+				resolver.release();
+				resolvers.remove(resolver);
+			} else {
+				System.out.println(" ******  Service RESOLVED:\nInterface: "
+						+ interfaceNum + "\nProtocol :"	+ proto + "\nName: " + name 
+						+ "\nType: " + type+ "\nHostname: "+ hostname +"\nDomain: "
+						+ domain+ "\nAddress: " + address + "\nFlags: " 
+						+ Avahi4JConstants.lookupResultToString(lookupResultFlag)
+						+ "\nTXT records:");
+				
+				for(String s: txtRecords)
+					System.out.println(s);
+			}
 		} else {
 			System.out.println("Unable to resolve name");
 		}

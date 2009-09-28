@@ -109,4 +109,27 @@ public final class ServiceBrowser {
 				BrowserEvent.values()[browserEvent], name, type, domain,
 				flags);
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ (int) (avahi4j_service_browser_ptr ^ (avahi4j_service_browser_ptr >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ServiceBrowser))
+			return false;
+		ServiceBrowser other = (ServiceBrowser) obj;
+		if (avahi4j_service_browser_ptr != other.avahi4j_service_browser_ptr)
+			return false;
+		return true;
+	}	
 }
