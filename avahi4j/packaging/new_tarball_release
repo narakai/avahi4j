@@ -1,0 +1,13 @@
+svn export avahi4j avahi4j-X.Y
+
+cd avahi4j-X.Y
+
+rm -Rf .classpath .cproject .project .settings src/svn-version.sh
+
+cat > src/version.h <<EOF
+#define VER_REV ""
+EOF
+
+Edit src/Makefile and remove version.h from clean target
+
+Edit Changelog
