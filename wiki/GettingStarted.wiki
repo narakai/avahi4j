@@ -3,25 +3,28 @@
 
 = Quick start guide =
 
-The following steps have been tested with Ubuntu Hardy and should remain unchanged for later versions.
+  * Download the latest stable version from the Downloads tab above and unpack the archive, or checkout the latest version from the SVN repository with
+{{{
+svn co http://avahi4j.googlecode.com/svn/avahi4j/trunk avahi4j
+}}}
+
+  * Install a Java JDK 6, Ant and the Avahi client development files. On Ubuntu, this can be done with
 {{{
 sudo apt-get install openjdk-6-jdk ant libavahi-client-dev 
-svn co http://avahi4j.googlecode.com/svn/avahi4j/trunk avahi4j
+}}}
+
+  * Compile Avahi4J and run a test app with 
+{{{
 ant clean all test-browse
 }}}
-In another terminal, run 
+The test application browses the local network for services of type `_test._tcp`
+
+  * In another terminal, run 
 {{{
 cd avahi4j
 ant test-publish
 }}}
-Press Enter and check the published service being resolved in the first terminal.
-
-The above steps:
- * download Avahi4J in the avahi4j/ directory,
- * install Open JDK 6, Ant and the Avahi client development files,
- * compile Avahi4J
- * run a sample application which browse for services of type "_test._tcp"
- * run a sample application which publishes a "_test._tcp" service on the local machine.
+This second application publishes a `_test._tcp` service on the local machine. Press Enter and check the published service being resolved in the first terminal.
 
 = Installation =
 Once you have successfully compiled Avahi4J and ran the sample applications, you can install Avahi4J on your machine by running with
