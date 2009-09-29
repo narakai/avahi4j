@@ -1,4 +1,4 @@
-#summary Getting started with Avvahi4J
+#summary Getting started with Avahi4J
 #labels Featured,Phase-Deploy
 
 = Quick start guide =
