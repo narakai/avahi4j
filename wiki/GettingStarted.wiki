@@ -1,0 +1,44 @@
+#summary Getting started with Avahi4J
+#labels Featured,Phase-Deploy
+
+= Quick start guide =
+
+The following steps have been tested with Ubuntu Hardy and should remain unchanged for later versions.
+{{{
+sudo apt-get install openjdk-6-jdk ant libavahi-client-dev 
+svn co http://avahi4j.googlecode.com/svn/avahi4j/trunk avahi4j
+ant clean all test-browse
+}}}
+In another terminal, run 
+{{{
+cd avahi4j
+ant test-publish
+}}}
+Press Enter and check the published service being resolved in the first terminal.
+
+The above steps:
+ * download Avahi4J in the avahi4j/ directory,
+ * install Open JDK 6, Ant and the Avahi client development files,
+ * compile Avahi4J
+ * run a sample application which browse for services of type "_test._tcp"
+ * run a sample application which publishes a "_test._tcp" service on the local machine.
+
+= Installation =
+Once you have successfully compiled Avahi4J and ran the sample applications, you can install Avahi4J on your machine by running with
+{{{
+sudo ant install
+}}}
+by default, this will copy `avahi4j.jar` in `/usr/share/java` and the JNI library `libavahi4j.so` in `/usr/lib/jni`.
+
+= Using Avahi4J in your own program =
+Avahi4J JavaDoc can be generated using
+{{{
+ant javadoc
+}}}
+
+Once Avahi4J has been installed, you can start using it in your own program. The only requirement is that you add `avahi4j.jar` to your classpath, and that you add the directory where the JNI library is located to the `java.library.path` property.
+
+This can be done by adding the following arguments when running the JVM:
+{{{
+-classpath /usr/share/java -Djava.library.path=/usr/lib/jni
+}}}
