@@ -34,7 +34,6 @@ static void browser_callback(AvahiRecordBrowser *b, AvahiIfIndex interface,
 	jint jif_idx, jproto, jevent, jclazz, jtype, jflags;
 	jstring jname;
 	jbyteArray array;
-	int i;
 
 	// attach the jvm to this thread
 	(*browser->jvm)->AttachCurrentThread(browser->jvm, (void **)&e, NULL);

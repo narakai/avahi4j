@@ -22,8 +22,16 @@
 #include "thread-watch.h"
 #include <jni.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "common.h"
+#include "version.h"
+
+JNIEXPORT jstring JNICALL Java_avahi4j_Client_getVersion(JNIEnv *e, jobject t) {
+	char version[16] = {0};
+	snprintf(version, 16, "%d.%d-%s", VER_MAJ, VER_MIN, VER_REV);
+	return (*e)->NewStringUTF(e,version);
+}
 
 static int translate_state(AvahiClientState state) {
 
