@@ -4,37 +4,41 @@ for Linux.
 
 = FEATURES =
 Avahi4J provides the following:
-* services publishing
-* services browsing
-* service resolution
+* services publishing: advertising Bonjour services on the local network,
+* services browsing: searching for specific Bonjour services on the local network,
+* service name resolution: finding IP addresses for a given host,
+* record browsing: finding specific DNS records for a given host, 
 
 
 = QUICK START =
 The following steps will get you started with Avahi4J. (The commands shown have
 been tested under Ubuntu):
 
-* Make sure Avahi and its development files are installed.
-sudo apt-get install libavahi-client-dev
+* Make sure Ant, openJDK 6, Avahi and its development files are installed.
+sudo apt-get install openjdk-6-jdk ant libavahi-client-dev
 
 - Make sure the Avahi daemon is running.
 sudo /etc/init.d/avahi-daemon start
 
-- Make sure Ant, and Java JDK 6 are installed.
-sudo apt-get install openjdk-6-jdk ant
-
 - Compile Avahi4J with:
 ant clean all
 
-- Run a test application:
-ant test-client
+- Run a sample application which looks for services of type '_test._tcp' :
+ant test-browse
 
+- In a separate terminal, run a sample application which publishes a service of
+  type '_test._tcp':
+ant test-publish
+
+
+= INSTALLATION =
 Avahi4J JAR file (avahi4j.jar) and JNI library (libavahi4j.so) can be installed
 and uninstalled with:
 sudo ant install
 sudo ant uninstall
 (Default JAR directory is /usr/share/java & JNI directory is /usr/lib/jni)
 
-- Generate Avahi4J's javadoc with
+The javadoc can be generated with
 ant javadoc
 
 - Assuming you have installed Avahi4j, you can use it in your own application.
@@ -58,4 +62,5 @@ sudo ant install
 
 
 = CONTACT =
-Feedback, issues and queries can be emailed to avahi4j@googlegroups.com
+Feedback, issues and queries can be emailed to the Avahi4J mailing list at:
+avahi4j@googlegroups.com

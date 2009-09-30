@@ -108,6 +108,7 @@ public class TestServicePublish implements IClientCallback, IEntryGroupCallback{
 			System.out.println("Error committing group: "
 					+Avahi4JConstants.getErrorString(result));
 		
+		System.out.println("done");
 	}
 	
 	/**

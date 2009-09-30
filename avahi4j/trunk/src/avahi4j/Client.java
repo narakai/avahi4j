@@ -86,6 +86,10 @@ public class Client {
 			// throw RunTimeError
 			throw new Error("Error loading JNI library.", t);
 		}
+		
+		String version = getVersion();
+		if(version!=null)
+			System.out.println("Avahi4J v"+version);
 	}
 	
 	/**
@@ -172,6 +176,11 @@ public class Client {
 	 * This method releases the client
 	 */
 	private native void releaseClient(long o);
+	/**
+	 * This method returns the Avahi4J version
+	 * @return the Avahi4J version
+	 */
+	private static native String getVersion();
 	
 	
 	/*
