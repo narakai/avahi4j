@@ -21,6 +21,7 @@ package avahi4j;
 import avahi4j.Avahi4JConstants.DNS_Class;
 import avahi4j.Avahi4JConstants.DNS_RRType;
 import avahi4j.Avahi4JConstants.Protocol;
+import avahi4j.ServiceResolver.ServiceResolverEvent;
 import avahi4j.examples.TestServiceBrowser;
 import avahi4j.examples.TestServicePublish;
 import avahi4j.exceptions.Avahi4JException;
@@ -79,7 +80,7 @@ public class Client {
 			System.out.println("Error loading the Avahi4J JNI library.");
 			System.out.println("Make sure you have specified the right directory"
 					+ " where the library can be found by passing;\n"
-					+ " -Djava.library.path=/path/to/jni/dir"
+					+ " -Djava.library.path=/path/to/jni_lib/dir"
 					+ " to the JVM. Currently, this is set to:\n"
 					+ System.getProperty("java.library.path")+"\n");
 			t.printStackTrace();
@@ -231,7 +232,7 @@ public class Client {
 	 * @param name the new host name
 	 * @return AVAHI_OK or one of AVAHI_ERR_* constants (see {@link Avahi4JConstants})
 	 */
-	public int setHostName(String name) {
+	public synchronized int setHostName(String name) {
 		return set_host_name(avahi4j_client_ptr, name);
 	}
 	
@@ -239,7 +240,7 @@ public class Client {
 	 * This method returns the current host name
 	 * @return the current host name
 	 */
-	public String getHostName() {
+	public synchronized String getHostName() {
 		return get_host_name(avahi4j_client_ptr);
 	}
 	
@@ -247,7 +248,7 @@ public class Client {
 	 * This method returns the current domain name
 	 * @return the current domain name
 	 */
-	public String getDomainName() {
+	public synchronized String getDomainName() {
 		return get_domain_name(avahi4j_client_ptr);
 	}
 	
@@ -255,7 +256,7 @@ public class Client {
 	 * This method returns the current fully-qualified domain name
 	 * @return the current fully-qualified domain name
 	 */
-	public String getFQDN() {
+	public synchronized String getFQDN() {
 		return get_fqdn(avahi4j_client_ptr);
 	}
 	
@@ -263,7 +264,7 @@ public class Client {
 	 * This method returns this client's current {@link State}.
 	 * @return this client's current {@link State}.
 	 */
-	public State getState() {
+	public synchronized State getState() {
 		return State.values()[get_state(avahi4j_client_ptr)];
 	}
 	
@@ -334,7 +335,7 @@ public class Client {
 	 * want to use {@link Protocol#ANY}). 
 	 * @param type the service type to browse (for instance '_workstation._tcp')
 	 * @param domain the domain to browse  (set it to null to browse on all domains)
-	 * @param lookupFlags lookup flags (See @link Avahi4JConstants.LOOKUP_*)
+	 * @param lookupFlags lookup flags (See LOOKUP_* in {@link Avahi4JConstants})
 	 * @return a service browser object which MUST be released (by calling
 	 * {@link ServiceBrowser#release()}) when done.
 	 * @throws Avahi4JException if there is an error creating the service browser
@@ -353,17 +354,26 @@ public class Client {
 	/**
 	 * This method create a new {@link ServiceResolver} object used to resolve 
 	 * services, ie find out the IP address of the server and associated TXT 
-	 * records. 
-	 * @param ifNum pass the exact interface number as received by the
-	 * service browser.
-	 * @param proto pass the exact protocol as received by the service browser.
-	 * @param name pass the exact name as received by the service browser
-	 * @param type pass the exact type as received by the service browser
-	 * @param domain pass the exact domain as received by the service browser
+	 * records. <b>The returned service resolver can be used to monitor changes
+	 * to a given service (for example, a change in the TXT records) as long as
+	 * the service resolver is active (ie, not released).</b>
+	 * @param ifNum the interface the service is running on. Pass the exact 
+	 * interface number as received by a service browser.
+	 * @param proto the protocol used by the service. Pass the exact protocol as
+	 * received by a service browser.
+	 * @param name the name of the service. Pass the exact name as received by a
+	 * service browser
+	 * @param type the service type. Pass the exact type as received by a 
+	 * service browser
+	 * @param domain the domain the service belongs to. Pass the exact domain as
+	 * received by a service browser
 	 * @param addressProtocol the protocol of the address to be resolved
-	 * @param lookupFlags lookup flags (See @link Avahi4JConstants.LOOKUP_*)
+	 * @param lookupFlags lookup flags (See LOOKUP_* in {@link Avahi4JConstants})
 	 * @return a service resolver object which MUST be released (by calling
-	 * {@link ServiceResolver#release()}) when done.
+	 * {@link ServiceResolver#release()}) when done. As long as the service 
+	 * resolver is active (ie, not released), updates to the service, such as 
+	 * changes to the service's TXT records or service removal, will be 
+	 * delivered to the resolver.
 	 * @throws Avahi4JException if there is an error creating the service resolver
 	 */
 	public synchronized ServiceResolver createServiceResolver(
@@ -405,6 +415,85 @@ public class Client {
 	}
 	
 	/**
+	 * This method resolves a service, blocks until the result is received and
+	 * returns it.
+	 * @param ifNum the interface the service is running on. Pass the exact 
+	 * interface number as received by a service browser.
+	 * @param proto the protocol used by the service. Pass the exact protocol as
+	 * received by a service browser.
+	 * @param name the name of the service. Pass the exact name as received by a
+	 * service browser
+	 * @param type the service type. Pass the exact type as received by a 
+	 * service browser
+	 * @param domain the domain the service belongs to. Pass the exact domain as
+	 * received by a service browser
+	 * @param addressProtocol the protocol of the address to be looked up
+	 * @param lookupFlags lookup flags (See Avahi4JConstants.LOOKUP_* in 
+	 * {@link Avahi4JConstants})
+	 * @return a ResolvedService object containing the details of the resolve service.
+	 * @throws Avahi4JException if there is an error resolving the service
+	 */
+	public static ResolvedService resolveService(int ifNum, Protocol proto, 
+			String name, String type, String domain, Protocol addressProtocol, 
+			int lookupFlags) throws Avahi4JException{
+		
+		Client client = null;
+		final ResolvedService result = new ResolvedService();
+		
+		try {
+			// create a new client and start it
+			client = new Client();
+			client.start();
+			
+			// create a service resolver and wait on the result. The callback
+			// object will wake us up
+			synchronized(result) {
+				client.createServiceResolver(new IServiceResolverCallback() {
+					
+					@Override
+					public void resolverCallback(ServiceResolver resolver, int interfaceNum,
+							Protocol proto, ServiceResolverEvent resolverEvent, String name,
+							String type, String domain, String hostname, Address address,
+							int port, String[] txtRecords, int lookupResultFlag) {
+						
+						result.address = address;
+						result.domain = domain;
+						result.hostname = hostname;
+						result.interfaceNum = interfaceNum;
+						result.lookupResultFlag = lookupResultFlag;
+						result.name = name;
+						result.port = port;
+						result.proto = proto;
+						result.resolverEvent = resolverEvent;
+						result.txtRecords = txtRecords;
+						result.type = type;
+						
+						synchronized(result){
+							// wake up waiting thread
+							result.notify();
+						}
+						
+						// discard resolver
+						resolver.release();
+					}
+				}, ifNum, proto, name, type, domain, addressProtocol, lookupFlags);	
+				result.wait();
+			}
+			
+		} catch (Throwable t){
+			if (client!=null)
+				client.release();
+
+			throw new Avahi4JException("Error resolving the service", t);
+		}
+
+		// stop and release the client
+		client.release();
+		
+		return result;
+	}
+	
+	/**
 	 * Called from JNI context when a callback is received
 	 * and needs to be dispatched to the registered {@link IClientCallback}
 	 * @param newState the new client state
@@ -435,6 +524,4 @@ public class Client {
 			return false;
 		return true;
 	}
-	
-	
 }

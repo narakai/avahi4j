@@ -28,6 +28,7 @@ import avahi4j.Client.State;
 public interface IClientCallback {
 	/**
 	 * This method is called when the state of a client changes.
+	 * <b>Do not call {@link Client#release()} in this method.</b>
 	 * @param state the new state
 	 */
 	public void clientStateChanged(State state);
