@@ -30,19 +30,22 @@ static void resolver_callback(AvahiServiceResolver *r, AvahiIfIndex interface,
 		AvahiLookupResultFlags flags, void *userdata)  {
 
 	dprint("[LOG] Entering %s\n", __PRETTY_FUNCTION__);
+
+	struct avahi4j_service_resolver *resolver = (struct avahi4j_service_resolver *) userdata;
 	char address_str[AVAHI_ADDRESS_STR_MAX];
 	jstring jname=NULL, jtype=NULL, jdomain=NULL, jhost=NULL, jaddress=NULL, jcurrent_txt=NULL;
 	jobjectArray txt_list=NULL;
 	jint jif_idx=0, jproto=0, jevent=0, jflags=0, jaddress_proto=0;
 	int index, num_txt_records=avahi_string_list_length(txt);
-
-	struct avahi4j_service_resolver *resolver = (struct avahi4j_service_resolver *) userdata;
 	JNIEnv *e;
+	JavaVM *vm;
 
-	dprint("[LOG] Entering1 %s\n", __PRETTY_FUNCTION__);
+	// save a ref to the VM so it can be called after the callback dispatch method
+	// returns, since  the avahi4j_record_browser structure may have been freed
+	vm = resolver->jvm;
 
 	// attach the jvm to this thread
-	(*resolver->jvm)->AttachCurrentThread(resolver->jvm, (void **)&e, NULL);
+	(*vm)->AttachCurrentThread(vm, (void **)&e, NULL);
 
 	// check event
 	GET_JAVA_RESOLVER_EVT(event, jevent);
@@ -110,9 +113,7 @@ static void resolver_callback(AvahiServiceResolver *r, AvahiIfIndex interface,
 
 bail:
 	// detach the jvm
-	(*resolver->jvm)->DetachCurrentThread(resolver->jvm);
-
-	return;
+	(*vm)->DetachCurrentThread(vm);
 }
 
 JNIEXPORT jlong JNICALL Java_avahi4j_ServiceResolver_init_1resolver(JNIEnv *e,

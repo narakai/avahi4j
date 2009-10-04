@@ -26,35 +26,35 @@ static jfieldID	address_field = NULL;
 
 
 JNIEXPORT jint JNICALL Java_avahi4j_Address(JNIEnv *e, jobject t, jlong ptr){
-	AvahiAddress address = (AvahiAddress) (uintptr_t) ptr;
+	AvahiAddress *address = (AvahiAddress *) (uintptr_t) ptr;
 
 	jstring jaddress;
 	jint protocol;
 
 	// get the field IDs for both the address and protocol fields
 	if (address_field==NULL){
-		jclass cls = (*e)->GetObjectClass(e, obj);
+		jclass cls = (*e)->GetObjectClass(e, t);
 		address_field = (*e)->GetFieldID(e, cls, "address", "Ljava/lang/String;");
 		if(address_field==NULL){
 			THROW_EXCEPTION(e, JNI_EXCP, "Unable to find the address field");
-			return;
+			return 0;
 		}
 	}
 
 	// set address member
-	if(address.proto==AVAHI_PROTO_INET){
-		char nice_address[AVAH_ADDRESS_STR_MAX];
-		avahi_address_snprint(nice_address, AVAH_ADDRESS_STR_MAX, address);
+	if(address->proto==AVAHI_PROTO_INET){
+		char nice_address[AVAHI_ADDRESS_STR_MAX];
+		avahi_address_snprint(nice_address, AVAHI_ADDRESS_STR_MAX, address);
 		jaddress = (*e)->NewStringUTF(e,nice_address);
 		(*e)->SetObjectField(e, t, address_field, jaddress);
-	} else if(address.proto==AVAHI_PROTO_INET6){
-		char nice_address[AVAH_ADDRESS_STR_MAX];
-		avahi_address_snprint(nice_address, AVAH_ADDRESS_STR_MAX, address);
+	} else if(address->proto==AVAHI_PROTO_INET6){
+		char nice_address[AVAHI_ADDRESS_STR_MAX];
+		avahi_address_snprint(nice_address, AVAHI_ADDRESS_STR_MAX, address);
 		jaddress = (*e)->NewStringUTF(e,nice_address);
 		(*e)->SetObjectField(e, t, address_field, jaddress);
 	}
 
-	GET_JAVA_PROTO(address.proto, protocol);
+	GET_JAVA_PROTO(address->proto, protocol);
 
 	return protocol;
 }

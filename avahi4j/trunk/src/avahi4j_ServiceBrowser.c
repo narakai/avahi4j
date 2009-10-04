@@ -30,9 +30,14 @@ static void browser_callback(AvahiServiceBrowser *b, AvahiIfIndex if_idx,
 	JNIEnv *e;
 	jstring jname, jtype, jdomain;
 	jint jproto, jif_idx, jflags, jevent;
+	JavaVM *vm;
+
+	// save a ref to the VM so it can be called after the callback dispatch method
+	// returns, since  the avahi4j_record_browser structure may have been freed
+	vm = browser->jvm;
 
 	// attach the jvm to this thread
-	(*browser->jvm)->AttachCurrentThread(browser->jvm, (void **)&e, NULL);
+	(*vm)->AttachCurrentThread(vm, (void **)&e, NULL);
 
 	// check event
 	GET_JAVA_BROWSER_EVT(event, jevent);
@@ -59,7 +64,7 @@ static void browser_callback(AvahiServiceBrowser *b, AvahiIfIndex if_idx,
 			jtype, jdomain, jflags);
 
 	// detach the jvm
-	(*browser->jvm)->DetachCurrentThread(browser->jvm);
+	(*vm)->DetachCurrentThread(vm);
 }
 
 JNIEXPORT jlong JNICALL Java_avahi4j_ServiceBrowser_initBrowser(JNIEnv *e, jobject t,

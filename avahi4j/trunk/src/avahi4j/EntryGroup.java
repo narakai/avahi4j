@@ -23,6 +23,23 @@ import java.util.Vector;
 import avahi4j.Avahi4JConstants.Protocol;
 import avahi4j.exceptions.Avahi4JException;
 
+/**
+ * An entry group is used to publish new services, and to update existing ones.
+ * To publish a new service:
+ * <ul>
+ * <li>Create an entry group by calling {@link Client#createEntryGroup()} on an 
+ * existing {@link Client}.</li>
+ * <li>Add one or more services by calling 
+ * {@link #addService(int, Avahi4JConstants.Protocol, String, String, String, String, int, List) addService()}</li>
+ * <li>Commit the groupm which will publish the services, with {@link #commit()}</li>
+ * </ul>
+ * Published services in a group can be updated by calling
+ * {@link #updateService(int, Avahi4JConstants.Protocol, String, String, String, List) updateService()}.
+ * Calling {@link #release()} will unpublish all services in the group.
+ * 
+ * @author gilles
+ *
+ */
 public class EntryGroup {
 	/**
 	 * This enumeration represents the various states an entry group
@@ -278,13 +295,6 @@ public class EntryGroup {
 		return add_service_txt_records(avahi4j_group_entry_ptr, interfaceNum, 
 				proto.ordinal(), name, type, domain, host, port,
 				txtRecord.toArray(new String[0]), numRecords);
-	}
-	
-	public void test(int i){
-		
-	}
-	public void test2(Protocol p){
-		
 	}
 	
 	/**

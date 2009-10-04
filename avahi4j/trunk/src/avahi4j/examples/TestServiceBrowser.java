@@ -152,7 +152,7 @@ public class TestServiceBrowser implements IClientCallback, IServiceBrowserCallb
 					System.out.println("error creating resolver");
 					e.printStackTrace();
 				}
-			}			
+			}
 		}
 	}
 
